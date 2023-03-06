@@ -21,7 +21,7 @@ jobs:
         run: make test
       - name: Build
         run: env NODE_ENV=production make build
-      - run: jq -s 'add'  package.json package-publish.json > package-final.json
+      - run: jq -s 'add'  package.json package-publish.json > package-final.json && rm -rf package.json && mv package-final.json package.json
       - id: Publish
         uses: JS-DevTools/npm-publish@v1
         with:
@@ -29,7 +29,6 @@ jobs:
           token: ${{ secrets.NPM_TOKEN }}
           access: "public"
           check-version: true
-          package: package-final.json
 
       - if: steps.publish.outputs.type != 'none'
         run: |
