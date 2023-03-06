@@ -43,3 +43,7 @@ export const HomePage =
 
 render(<HomePage name="John Doe" />, document.body);
 ```
+
+## Motivation
+
+The state part of this library is based on [haptic](https://github.com/heyheyhello/haptic). It's also influenced by Sinuous, Solid, S.js, Reactor.js, and Dipole.

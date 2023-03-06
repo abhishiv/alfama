@@ -1,8 +1,19 @@
 {
   "name": "dylanjs",
-  "version": "0.0.5",
-  "description": "",
-  "main": "./src/lib.ts",
+  "version": "0.0.6",
+  "description": "Fine-grained reactive library in 5kb with no compiler, no magic, and no virtual DOM",
+  "keywords": [
+    "reactive",
+    "dom",
+    "tsx",
+    "frontend",
+    "framework"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/abhishiv/dylanjs"
+  },
+  "main": "./src/index.ts",
   "files": [
     "/dist"
   ],
@@ -24,16 +35,14 @@
       "require": "./src/state.ts"
     }
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Abhishiv Saxena<abhishiv@gmail.com>",
+  "license": "MIT",
   "devDependencies": {
     "typescript": "^4.9.5",
     "vite": "^4.1.4",
     "vitest": "^0.28.5"
   },
   "dependencies": {
-    "haptic": "^0.10.1",
-    "nanoid": "^4.0.1",
     "tree-crawl": "^1.2.1"
   }
 }
