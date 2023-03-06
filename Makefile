@@ -1,6 +1,11 @@
 .PHONY: project
 project:
+	make install
 	make build
+
+.PHONY: install
+install:
+	npm install --prefix ./
 
 .PHONY: test
 test:
