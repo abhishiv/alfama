@@ -3,6 +3,9 @@
   "version": "0.0.3",
   "description": "",
   "main": "./src/lib.ts",
+  "files": [
+    "/dist"
+  ],
   "scripts": {
     "test": "vitest",
     "coverage": "vitest run --coverage"
