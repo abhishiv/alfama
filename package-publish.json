@@ -1,0 +1,17 @@
+{
+  "main": "./dist/cjs/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    },
+    "./dom": {
+      "import": "./dist/esm/dom.js",
+      "require": "./dist/cjs/dom.js"
+    },
+    "./state": {
+      "import": "./dist/esm/state.js",
+      "require": "./dist/cjs/state.js"
+    }
+  }
+}
