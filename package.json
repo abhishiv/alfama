@@ -1,0 +1,35 @@
+{
+  "name": "dylanjs",
+  "version": "0.0.1",
+  "description": "",
+  "main": "./src/lib.ts",
+  "scripts": {
+    "test": "vitest",
+    "coverage": "vitest run --coverage"
+  },
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "require": "./src/index.ts"
+    },
+    "./dom": {
+      "import": "./src/dom.ts",
+      "require": "./src/dom.ts"
+    },
+    "./state": {
+      "import": "./src/state.ts",
+      "require": "./src/state.ts"
+    }
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "vite": "^4.1.4",
+    "vitest": "^0.28.5"
+  },
+  "dependencies": {
+    "haptic": "^0.10.1",
+    "nanoid": "^4.0.1",
+    "tree-crawl": "^1.2.1"
+  }
+}
