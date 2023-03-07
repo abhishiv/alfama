@@ -1,5 +1,12 @@
 import { signal, wire, Wire } from "./state";
 import { crawl } from "./crawl";
+import type {
+  GenericEventAttrs,
+  HTMLAttrs,
+  SVGAttrs,
+  HTMLElements,
+  SVGElements,
+} from "./jsx";
 
 export interface ComponentHelpers {
   wire: Function;
@@ -78,7 +85,9 @@ export function createDOMNode(step: TreeStep) {
     const el = document.createElement(t);
     const { children, ...rest } = props;
     for (var key in rest) {
-      (el as any)[key] = rest[key];
+      const finalKey: string =
+        key[0] == "o" && key[1] == "n" ? key.toLowerCase() : key;
+      (el as any)[finalKey] = rest[key];
     }
 
     return el;
@@ -236,9 +245,45 @@ export function h(t: any, p: any, ...children: any): any {
   };
 }
 
-export namespace h.JSX {
-  export type IntrinsicElements = {
-    div: any;
-    [key: string]: any;
-  };
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type DistributeWire<T> = T extends any ? Wire<T> : never;
+
+export namespace h {
+  export namespace JSX {
+    export type MaybeWire<T> = T | DistributeWire<T>;
+    export type AllowWireForProperties<T> = { [K in keyof T]: MaybeWire<T[K]> };
+
+    export type Element = VirtualElement;
+
+    export interface ElementAttributesProperty {
+      props: unknown;
+    }
+    export interface ElementChildrenAttribute {
+      children: unknown;
+    }
+
+    // Prevent children on components that don't declare them
+    export interface IntrinsicAttributes {
+      children?: never;
+    }
+
+    // Allow children on all DOM elements (not components, see above)
+    // ESLint will error for children on void elements like <img/>
+    export type DOMAttributes<Target extends EventTarget> =
+      GenericEventAttrs<Target> & { children?: unknown };
+
+    export type HTMLAttributes<Target extends EventTarget> =
+      AllowWireForProperties<Omit<HTMLAttrs, "style">> & {
+        style?:
+          | MaybeWire<string>
+          | { [key: string]: MaybeWire<string | number> };
+      } & DOMAttributes<Target>;
+
+    export type SVGAttributes<Target extends EventTarget> =
+      AllowWireForProperties<SVGAttrs> & HTMLAttributes<Target>;
+
+    export type IntrinsicElements = {
+      [El in keyof HTMLElements]: HTMLAttributes<HTMLElements[El]>;
+    } & { [El in keyof SVGElements]: SVGAttributes<SVGElements[El]> };
+  }
 }
