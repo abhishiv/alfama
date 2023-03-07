@@ -21,23 +21,21 @@ function dfsPostOrder<T>(
 
   while (stack.length > 0) {
     const { node, visitedChildren } = stack[stack.length - 1];
-    console.log(node, visitedChildren);
     // If all the node's children have been visited, visit the node and pop it from the stack.
     if (visitedChildren) {
-      //iterate(node);
+      iterate(node);
       stack.pop();
     } else {
-      // Otherwise, push all the unvisited children onto the stack.
-      const children = getChildren(node);
-      console.log(children);
-      children.forEach((child) => {
-        if (!visited.has(child)) {
-          //stack.push({ node: child, visitedChildren: false });
-        }
-      });
       visited.add(node);
       // Mark that we've visited the node's children.
       stack[stack.length - 1].visitedChildren = true;
+      // Otherwise, push all the unvisited children onto the stack.
+      const children = (getChildren(node) || []).reverse();
+      children.forEach((child) => {
+        if (!visited.has(child)) {
+          stack.push({ node: child, visitedChildren: false });
+        }
+      });
     }
   }
 }

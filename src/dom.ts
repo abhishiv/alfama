@@ -123,7 +123,6 @@ export function crawlTree(el: VirtualElement) {
   crawl(
     root,
     function (step) {
-      console.log("step", step);
       // why is this necessary?
       const parent = step.parent;
       const dom = createDOMNode(step);
@@ -147,7 +146,6 @@ export function crawlTree(el: VirtualElement) {
     {
       order: "post",
       getChildren: ({ node, id: parentId }): TreeStep[] => {
-        console.log("getChildren", node);
         const parent = intermediateRgeistry[parentId] || root;
         if (node && typeof node === "object") {
           if ((node.t as Wire).$wire) {
@@ -158,7 +156,6 @@ export function crawlTree(el: VirtualElement) {
               signal: (val: any) => {
                 const s = signal.anon(val);
                 const parentRecord = intermediateRgeistry[parentId];
-                console.log(parentId);
                 parentRecord.signals.push(s);
                 return s;
               },

@@ -10,7 +10,7 @@ Fine grained reactive UI Library
 
 ---
 
--   **Small.** hello world at `~5kB` gzip.
+-   **Small.** hello world at `~3kB` gzip.
 -   **Truly reactive.** automatically derived from the app state.
 -   **DevEx.** no compile step needed, choose your [view syntax](#view-syntax).
 
