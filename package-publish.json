@@ -13,6 +13,10 @@
     "./state": {
       "import": "./dist/esm/state.js",
       "require": "./dist/cjs/state.js"
+    },
+    "./stdlib": {
+      "import": "./dist/esm/stdlib/index.js",
+      "require": "./dist/cjs/stdlib/index.js"
     }
   }
 }

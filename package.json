@@ -33,6 +33,10 @@
     "./state": {
       "import": "./src/state.ts",
       "require": "./src/state.ts"
+    },
+    "./stdlib": {
+      "import": "./src/stdlib/index.ts",
+      "require": "./src/stdlib/index.ts"
     }
   },
   "author": "Abhishiv Saxena<abhishiv@gmail.com>",

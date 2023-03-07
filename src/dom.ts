@@ -233,7 +233,7 @@ export function component<T = any>(
   return def as Component<T>;
 }
 
-export function h(t: any, p: any, ...children: any): any {
+export function h(t: any, p?: any, ...children: any): any {
   const props = {
     ...(p || {}),
     children: [...((p || {}).children || []), ...(children || [])],
