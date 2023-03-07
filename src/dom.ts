@@ -80,25 +80,23 @@ export function createDOMNode(step: TreeStep) {
     for (var key in rest) {
       (el as any)[key] = rest[key];
     }
-    //    children.forEach((child: Node) => {
-    //      if (child instanceof window.Node) {
-    //        el.appendChild(child);
-    //      } else if (typeof child == "string") {
-    //        // text node
-    //        const childEL = document.createTextNode(child);
-    //        el.appendChild(childEL);
-    //      } else if (typeof child === "function") {
-    //        const wire = child as Wire;
-    //        const childEL = document.createTextNode(wire());
-    //        wire.tasks.add((val: any) => {
-    //          childEL.textContent = val;
-    //        });
-    //        el.appendChild(childEL);
-    //      }
-    //    });
 
     return el;
   }
+}
+
+function findAncestorWithCtxName(
+  ctxName: string,
+  node: TreeStep
+): TreeStep | null {
+  let ancestor = node.parent;
+  while (ancestor) {
+    if (ancestor.ctx && ancestor.ctx[ctxName]) {
+      return ancestor;
+    }
+    ancestor = ancestor.parent;
+  }
+  return null;
 }
 
 export function crawlTree(el: VirtualElement) {
@@ -123,7 +121,6 @@ export function crawlTree(el: VirtualElement) {
   crawl(
     root,
     function (step) {
-      // why is this necessary?
       const parent = step.parent;
       const dom = createDOMNode(step);
       if (dom) {
@@ -166,11 +163,15 @@ export function crawlTree(el: VirtualElement) {
                 return w;
               },
               createContext: (name: string, defaultValue: any) => {
-                console.log("createcontext", name, defaultValue);
                 parent.ctx[name] = helpers.signal(defaultValue);
               },
               getContext: (token: any) => {
-                console.log("get context", parent);
+                const ancestor = findAncestorWithCtxName(token, parent);
+                if (ancestor) {
+                  return ancestor.ctx[token];
+                } else {
+                  // throw?
+                }
               },
             };
             const el = node.t(node.p, helpers) as VirtualElement;
@@ -209,7 +210,6 @@ export function crawlTree(el: VirtualElement) {
 }
 
 export function render(element: VirtualElement, container: HTMLElement) {
-  console.log("render");
   const { root, registry } = crawlTree(element);
   root.dom && container.appendChild(root.dom);
 }
