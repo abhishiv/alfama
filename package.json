@@ -1,6 +1,6 @@
 {
   "name": "dylanjs",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Fine-grained reactive library in 5kb with no compiler, no magic, and no virtual DOM",
   "keywords": [
     "reactive",
@@ -42,7 +42,5 @@
     "vite": "^4.1.4",
     "vitest": "^0.28.5"
   },
-  "dependencies": {
-    "tree-crawl": "^1.2.1"
-  }
+  "dependencies": {}
 }

@@ -1,9 +1,11 @@
 import { signal, wire, Wire } from "./state";
-import crawl from "tree-crawl";
+import { crawl } from "./crawl";
 
 export interface ComponentHelpers {
   wire: Function;
   signal: Function;
+  createContext(name: string, defaultValue: any): any;
+  getContext(token: any): any;
 }
 export type Component<T = any> = {
   (props: T, helpers: ComponentHelpers): VirtualElement;
@@ -27,6 +29,7 @@ export type TreeStep = {
   signals?: any[];
   dom?: Element | Text | DocumentFragment;
   parent?: TreeStep;
+  ctx: Record<string, any>;
 };
 
 function getLocalId(el: VirtualElement, i?: number): string {
@@ -102,6 +105,9 @@ export function crawlTree(el: VirtualElement) {
   const root: TreeStep = {
     id: getLocalId(el),
     node: el,
+    signals: [],
+    wires: [],
+    ctx: {},
   };
 
   const intermediateRgeistry: any = {};
@@ -117,6 +123,7 @@ export function crawlTree(el: VirtualElement) {
   crawl(
     root,
     function (step) {
+      console.log("step", step);
       // why is this necessary?
       const parent = step.parent;
       const dom = createDOMNode(step);
@@ -140,6 +147,7 @@ export function crawlTree(el: VirtualElement) {
     {
       order: "post",
       getChildren: ({ node, id: parentId }): TreeStep[] => {
+        console.log("getChildren", node);
         const parent = intermediateRgeistry[parentId] || root;
         if (node && typeof node === "object") {
           if ((node.t as Wire).$wire) {
@@ -150,6 +158,7 @@ export function crawlTree(el: VirtualElement) {
               signal: (val: any) => {
                 const s = signal.anon(val);
                 const parentRecord = intermediateRgeistry[parentId];
+                console.log(parentId);
                 parentRecord.signals.push(s);
                 return s;
               },
@@ -158,6 +167,13 @@ export function crawlTree(el: VirtualElement) {
                 const parentRecord = intermediateRgeistry[parentId];
                 parentRecord.wires.push(w);
                 return w;
+              },
+              createContext: (name: string, defaultValue: any) => {
+                console.log("createcontext", name, defaultValue);
+                parent.ctx[name] = helpers.signal(defaultValue);
+              },
+              getContext: (token: any) => {
+                console.log("get context", parent);
               },
             };
             const el = node.t(node.p, helpers) as VirtualElement;
@@ -168,6 +184,7 @@ export function crawlTree(el: VirtualElement) {
                 signals: [],
                 wires: [],
                 parent,
+                ctx: {},
               };
               intermediateRgeistry[step.id] = step;
               return step;
@@ -180,6 +197,7 @@ export function crawlTree(el: VirtualElement) {
                 signals: [],
                 wires: [],
                 parent,
+                ctx: {},
               };
               intermediateRgeistry[step.id] = step;
               return step;
@@ -194,6 +212,7 @@ export function crawlTree(el: VirtualElement) {
 }
 
 export function render(element: VirtualElement, container: HTMLElement) {
+  console.log("render");
   const { root, registry } = crawlTree(element);
   root.dom && container.appendChild(root.dom);
 }
