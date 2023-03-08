@@ -233,7 +233,7 @@ export function component<T = any>(
   return def as Component<T>;
 }
 
-export function h(t: any, p?: any, ...children: any): any {
+function h(t: any, p?: any, ...children: any): any {
   const props = {
     ...(p || {}),
     children: [...((p || {}).children || []), ...(children || [])],
@@ -244,11 +244,11 @@ export function h(t: any, p?: any, ...children: any): any {
     t,
   };
 }
-
+export { h };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type DistributeWire<T> = T extends any ? Wire<T> : never;
 
-export namespace h {
+declare namespace h {
   export namespace JSX {
     export type MaybeWire<T> = T | DistributeWire<T>;
     export type AllowWireForProperties<T> = { [K in keyof T]: MaybeWire<T[K]> };

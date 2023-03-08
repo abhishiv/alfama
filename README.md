@@ -31,7 +31,7 @@ export const HomePage =
 		const count = signal(0);
 		return (
 			<div id="home">
-				<p>Hey, ${props.name}</p>
+				<p>Hey, {props.name}</p>
 				<button
 					onclick={() => {
 						count(count() + 1);
