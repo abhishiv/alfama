@@ -1,4 +1,4 @@
-import { signal, wire, Wire } from "./state";
+import { signal, wire, Wire } from "./experimental/internal";
 import { crawl } from "./crawl";
 import type {
   GenericEventAttrs,
@@ -50,7 +50,6 @@ function getLocalId(el: VirtualElement, i?: number): string {
 }
 
 export function createDOMNode(step: TreeStep) {
-  //console.log({ step });
   if (!step || !step.node) return;
 
   if (
@@ -219,8 +218,18 @@ export function crawlTree(el: VirtualElement) {
 }
 
 export function render(element: VirtualElement, container: HTMLElement) {
+  const id = getLocalId(element);
+  console.log(id);
+  const domKey = id + "_dom";
+  const existingState = (container as any)[id] || {};
+  console.log(existingState);
+
   const { root, registry } = crawlTree(element);
-  root.dom && container.appendChild(root.dom);
+  (container as any)[id] = registry;
+  if (root.dom) {
+    container.innerHTML = "";
+    container.appendChild(root.dom);
+  }
 }
 
 export function component<T = any>(

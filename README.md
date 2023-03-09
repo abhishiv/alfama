@@ -3,6 +3,8 @@
 Fine grained reactive UI Library
 
 [![Version](https://img.shields.io/npm/v/dylanjs.svg?color=success&style=flat-square)](https://www.npmjs.com/package/dylanjs)
+[![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
+[![Build Status](https://github.com/abhishiv/dylanjs/actions/workflows/deployment.yml/badge.svg)](https://github.com/abhishiv/dylanjs/actions/workflows/deployment.yml)
 ![Badge size](https://img.badgesize.io/https://cdn.jsdelivr.net/npm/dylanjs/+esm?compression=gzip&label=gzip&style=flat-square)
 
 **npm**: `npm i dylanjs`  

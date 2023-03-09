@@ -15,11 +15,13 @@
     },
     "./state": {
       "import": "./dist/esm/state.js",
-      "require": "./dist/cjs/state.js"
+      "require": "./dist/cjs/state.js",
+      "types": "./dist/esm/state.d.ts"
     },
     "./stdlib": {
       "import": "./dist/esm/stdlib/index.js",
-      "require": "./dist/cjs/stdlib/index.js"
+      "require": "./dist/cjs/stdlib/index.js",
+      "types": "./dist/esm/stdlib/index.d.ts"
     }
   }
 }

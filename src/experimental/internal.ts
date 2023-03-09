@@ -8,10 +8,11 @@ export interface Signal<T = any> {
   type: typeof SIGNAL_TYPE;
   tokens: SubToken[];
 }
-export interface Wire {
+export interface Wire<T = any> {
   (): any;
   type: typeof WIRE_TYPE;
-  tasks: Function[];
+  tasks: Set<Function>;
+  $wire: 1;
 }
 export interface SubToken {
   (): any;
@@ -44,6 +45,7 @@ export function createSignal<T>(arg?: T): Signal {
   signal.tokens = [] as SubToken[];
   return signal;
 }
+export const signal = { anon: createSignal };
 function getToken(wire: Wire) {
   const token: SubToken = () => {};
   token.type = TOKEN_TYPE;
@@ -60,6 +62,7 @@ export function wire(arg: Signal | ((token: SubToken) => void)) {
   };
   const token = getToken(wire as unknown as Wire);
   wire.token = token;
-  wire.tasks = [] as Function[];
+  wire.tasks = new Set() as Set<Function>;
+  wire["$wire"] = 1;
   return wire;
 }

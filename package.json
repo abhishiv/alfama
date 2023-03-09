@@ -1,11 +1,13 @@
 {
   "name": "dylanjs",
-  "version": "0.0.13",
-  "description": "Fine-grained reactive library in 5kb with no compiler, no magic, and no virtual DOM",
+  "version": "0.0.15",
+  "author": "Abhishiv Saxena<abhishiv@gmail.com>",
+  "license": "MIT",
+  "description": "Fine-grained reactive library with no compiler, no magic, and no virtual DOM",
   "keywords": [
     "reactive",
     "dom",
-    "tsx",
+    "ui",
     "frontend",
     "framework"
   ],
@@ -13,14 +15,22 @@
     "type": "git",
     "url": "https://github.com/abhishiv/dylanjs"
   },
-  "main": "./src/index.ts",
   "files": [
-    "/dist"
+    "./dist"
   ],
+  "devDependencies": {
+    "typescript": "^4.9.5",
+    "vite": "^4.1.4",
+    "vitest": "^0.28.5"
+  },
+  "dependencies": {
+    "immer": "^9.0.19"
+  },
   "scripts": {
     "test": "vitest",
     "coverage": "vitest run --coverage"
   },
+  "main": "./src/index.ts",
   "exports": {
     ".": {
       "import": "./src/index.ts",
@@ -38,15 +48,5 @@
       "import": "./src/stdlib/index.ts",
       "require": "./src/stdlib/index.ts"
     }
-  },
-  "author": "Abhishiv Saxena<abhishiv@gmail.com>",
-  "license": "MIT",
-  "devDependencies": {
-    "typescript": "^4.9.5",
-    "vite": "^4.1.4",
-    "vitest": "^0.28.5"
-  },
-  "dependencies": {
-    "immer": "^9.0.19"
   }
 }
