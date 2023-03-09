@@ -14,9 +14,9 @@
       "types": "./dist/esm/dom.d.ts"
     },
     "./state": {
-      "import": "./dist/esm/state.js",
-      "require": "./dist/cjs/state.js",
-      "types": "./dist/esm/state.d.ts"
+      "import": "./dist/esm/experimental/state.js",
+      "require": "./dist/cjs/experimental/state.js",
+      "types": "./dist/esm/experimental/state.d.ts"
     },
     "./stdlib": {
       "import": "./dist/esm/stdlib/index.js",

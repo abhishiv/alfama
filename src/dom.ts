@@ -1,4 +1,4 @@
-import { signal, wire, Wire } from "./experimental/internal";
+import { signal, wire, Wire } from "./experimental/state";
 import { crawl } from "./crawl";
 import type {
   GenericEventAttrs,

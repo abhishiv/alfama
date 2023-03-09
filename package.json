@@ -1,6 +1,6 @@
 {
   "name": "dylanjs",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "author": "Abhishiv Saxena<abhishiv@gmail.com>",
   "license": "MIT",
   "description": "Fine-grained reactive library with no compiler, no magic, and no virtual DOM",
@@ -41,8 +41,8 @@
       "require": "./src/dom.ts"
     },
     "./state": {
-      "import": "./src/state.ts",
-      "require": "./src/state.ts"
+      "import": "./src/experimental/state.ts",
+      "require": "./src/experimental/state.ts"
     },
     "./stdlib": {
       "import": "./src/stdlib/index.ts",

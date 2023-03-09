@@ -1,3 +1,3 @@
 export * from "./dom";
-export * from "./state";
+export * from "./experimental/state";
 export * from "./stdlib/index";
