@@ -18,7 +18,7 @@ Fine grained reactive UI Library
 
 #### Example
 
-[Counter - Codesandbox](https://stackblitz.com/edit/react-ts-8pa1lj?file=index.tsx)
+[Counter - Codesandbox](https://codesandbox.io/s/counter-demo-dylanjs-t7ift3?file=/src/index.tsx)
 
 ```jsx
 /** @jsx h **/
