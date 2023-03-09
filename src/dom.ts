@@ -257,7 +257,7 @@ export { h };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type DistributeWire<T> = T extends any ? Wire<T> : never;
 
-declare namespace h {
+export declare namespace h {
   export namespace JSX {
     export type MaybeWire<T> = T | DistributeWire<T>;
     export type AllowWireForProperties<T> = { [K in keyof T]: MaybeWire<T[K]> };
