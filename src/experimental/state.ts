@@ -7,6 +7,7 @@ export interface Signal<T = any> {
   value: T;
   type: typeof SIGNAL_TYPE;
   tokens: SubToken[];
+  $signal: 1;
 }
 export interface Wire<T = any> {
   (): any;
@@ -19,6 +20,7 @@ export interface SubToken {
   type: typeof TOKEN_TYPE;
   deps: any[];
   wire: Wire;
+  $st: 1;
 }
 
 export function createSignal<T>(arg?: T): Signal {
@@ -43,16 +45,21 @@ export function createSignal<T>(arg?: T): Signal {
   signal.type = SIGNAL_TYPE;
   signal.value = arg;
   signal.tokens = [] as SubToken[];
+  signal["$signal"] = 1 as 1;
   return signal;
 }
+
 export const signal = { anon: createSignal };
+
 function getToken(wire: Wire) {
   const token: SubToken = () => {};
   token.type = TOKEN_TYPE;
   token.deps = [];
   token.wire = wire;
+  token["$st"] = 1 as 1;
   return token;
 }
+
 export function wire(arg: Signal | ((token: SubToken) => void)) {
   const fn =
     (arg as Signal).type == SIGNAL_TYPE ? (token: SubToken) => arg(token) : arg;

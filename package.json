@@ -27,8 +27,8 @@
     "immer": "^9.0.19"
   },
   "scripts": {
-    "test": "vitest",
-    "coverage": "vitest run --coverage"
+    "test": "npx vitest --run",
+    "coverage": "vitest run --coverage --run"
   },
   "main": "./src/index.ts",
   "exports": {

@@ -9,7 +9,7 @@ install:
 
 .PHONY: test
 test:
-	pwd
+	npm run test
 
 .PHONY: build
 build:
