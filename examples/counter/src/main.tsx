@@ -1,6 +1,6 @@
 /** @jsx h **/
 
-import { component, h, render } from "dylanjs/dom";
+import { component, h, render } from "dylanjs";
 
 export const HomePage = component<{ name: string }>(
   "HomePage",
@@ -8,9 +8,9 @@ export const HomePage = component<{ name: string }>(
     const count = signal(0);
     return (
       <div id="home">
-        <p>Hey, ${props.name}</p>
+        <p>Hey, {props.name}</p>
         <button
-          onclick={() => {
+          onClick={() => {
             count(count() + 1);
           }}
         >

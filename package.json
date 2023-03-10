@@ -23,9 +23,6 @@
     "vite": "^4.1.4",
     "vitest": "^0.28.5"
   },
-  "dependencies": {
-    "immer": "^9.0.19"
-  },
   "scripts": {
     "test": "npx vitest --run",
     "coverage": "vitest run --coverage --run"
@@ -48,5 +45,6 @@
       "import": "./src/stdlib/index.ts",
       "require": "./src/stdlib/index.ts"
     }
-  }
+  },
+  "dependencies": {}
 }

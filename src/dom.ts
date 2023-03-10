@@ -84,6 +84,8 @@ export function createDOMNode(step: TreeStep) {
     const el = document.createElement(t);
     const { children, ...rest } = props;
     for (var key in rest) {
+      // onClick to onclick
+      // TODO: handle it better?
       const finalKey: string =
         key[0] == "o" && key[1] == "n" ? key.toLowerCase() : key;
       (el as any)[finalKey] = rest[key];

@@ -9,12 +9,14 @@ export interface Signal<T = any> {
   tokens: SubToken[];
   $signal: 1;
 }
+
 export interface Wire<T = any> {
   (): any;
   type: typeof WIRE_TYPE;
   tasks: Set<Function>;
   $wire: 1;
 }
+
 export interface SubToken {
   (): any;
   type: typeof TOKEN_TYPE;
