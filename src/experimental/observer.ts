@@ -29,7 +29,7 @@ export type Validator = (change: ChangeReport) => boolean;
  * - getPath('obj.nested', 'prop') => 'obj.nested.prop'
  * - getPath('', 'prop') => 'prop'
  */
-function getPath(path, prop) {
+function getPath(path: any, prop: any) {
     if (path.length !== 0) return `${path}.${prop}`;
     else return prop;
 }
@@ -38,8 +38,8 @@ function getPath(path, prop) {
  * Provides simple way to "proxify" nested objects and validate the changes.
  */
 export let Observer = (function () {
-    function _create(
-        target,
+    function _create<T = any>(
+        target: T,
         validator: Validator,
         path: string,
         lastInPath: string
@@ -48,7 +48,9 @@ export let Observer = (function () {
         let proxies: { [prop: string]: any } = {};
 
         let proxyHandler = {
-            get: function get(target, prop) {
+            get: function get(target: any, prop: any) {
+                console.log(prop);
+
                 // Special properties
                 if (prop === "__target") return target;
                 if (prop === "__isProxy") return true;
@@ -58,7 +60,7 @@ export let Observer = (function () {
 
                 // Functions
                 if (typeof value === "function") {
-                    return function (...args) {
+                    return function (this: any, ...args: any[]) {
                         if (
                             validator({
                                 path: path,
@@ -105,7 +107,7 @@ export let Observer = (function () {
                     return value;
                 }
             },
-            set: function set(target, prop, value) {
+            set: function set(target: any, prop: any, value: any) {
                 if (
                     validator({
                         path: getPath(path, prop),
@@ -120,7 +122,7 @@ export let Observer = (function () {
 
                 return true;
             },
-            deleteProperty: function deleteProperty(target, prop) {
+            deleteProperty: function deleteProperty(target: any, prop: any) {
                 if (
                     validator({
                         path: getPath(path, prop),
@@ -137,11 +139,11 @@ export let Observer = (function () {
             },
         };
 
-        return new Proxy(target, <any>proxyHandler);
+        return new Proxy(target as any, <any>proxyHandler);
     }
 
     return {
-        create: function create(target, validator: Validator) {
+        create: function create(target: any, validator: Validator) {
             return _create(target, validator, "", "");
         },
     };

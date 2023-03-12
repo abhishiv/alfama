@@ -28,13 +28,16 @@ export interface SubToken {
 export function createSignal<T>(arg?: T): Signal {
   let state;
   const signal = (arg?: SubToken | T) => {
+    // read subscribe
     if (arg && (arg as SubToken).type == TOKEN_TYPE) {
       const token = arg as SubToken;
       signal.tokens.push(token);
       token.deps.push(signal);
       return signal.value;
+      // read
     } else if (arg === undefined) {
       return signal.value;
+      // write
     } else {
       signal.value = arg as T;
       for (var token of signal.tokens) {
@@ -48,6 +51,8 @@ export function createSignal<T>(arg?: T): Signal {
   signal.value = arg;
   signal.tokens = [] as SubToken[];
   signal["$signal"] = 1 as 1;
+  console.log(signal);
+
   return signal;
 }
 

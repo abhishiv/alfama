@@ -256,6 +256,7 @@ function h(t: any, p?: any, ...children: any): any {
   };
 }
 export { h };
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type DistributeWire<T> = T extends any ? Wire<T> : never;
 
