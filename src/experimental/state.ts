@@ -51,8 +51,6 @@ export function createSignal<T>(arg?: T): Signal {
   signal.value = arg;
   signal.tokens = [] as SubToken[];
   signal["$signal"] = 1 as 1;
-  console.log(signal);
-
   return signal;
 }
 
