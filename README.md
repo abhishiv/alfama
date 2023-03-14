@@ -14,21 +14,19 @@ Fine grained reactive UI Library
 
 -   **Small.** hello world at `~3kB` gzip.
 -   **Truly reactive.** automatically derived from the app state.
--   **DevEx.** no compile step needed, choose your [view syntax](#view-syntax).
+-   **DevEx.** no compile step needed, choose your view syntax: `h` or `<JSX/>`.
 
 #### Example
 
 [Counter - Codesandbox](https://codesandbox.io/s/counter-demo-dylanjs-t7ift3?file=/src/index.tsx)
 
-```jsx
+```tsx
 /** @jsx h **/
 
 import { component, h, render } from "dylanjs/dom";
 
-export const HomePage =
-    component <
-    { name: string } >
-    ("HomePage",
+export const HomePage = component<{ name: string }>(
+    "HomePage",
     (props, { signal, wire }) => {
         const count = signal(0);
         return (
@@ -43,11 +41,25 @@ export const HomePage =
                 </button>
             </div>
         );
-    });
+    }
+);
 
 render(<HomePage name="John Doe" />, document.body);
 ```
 
 ## Motivation
 
-The state part of this library is based on [haptic](https://github.com/heyheyhello/haptic). It's also influenced by Sinuous, Solid, & S.js
+The state part of this library is based on [haptic](https://github.com/heyheyhello/haptic) specially the concept of aptly named Signals and Wires. Like haptic it also favours manual subscription model instead of automatic subscriptions model.
+
+```tsx
+/** @jsx h **/
+```
+
+It's also influenced by Sinuous, Solid, & S.js
+
+## API
+
+-   signal
+-   wire
+-   getContext
+-   setContext

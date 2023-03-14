@@ -1,6 +1,6 @@
 {
   "name": "dylanjs",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "author": "Abhishiv Saxena<abhishiv@gmail.com>",
   "license": "MIT",
   "description": "Fine-grained reactive library with no compiler, no magic, and no virtual DOM",
