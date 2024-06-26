@@ -1,0 +1,50 @@
+{
+  "name": "alfama",
+  "version": "0.3.22",
+  "author": "Abhishiv Saxena<abhishiv@gmail.com>",
+  "license": "MIT",
+  "description": "Fine-grained reactive library with no compiler, no magic, and no virtual DOM",
+  "keywords": [
+    "reactive",
+    "dom",
+    "ui",
+    "frontend",
+    "framework"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/abhishiv/alfama"
+  },
+  "files": [
+    "./dist"
+  ],
+  "devDependencies": {
+    "esbuild": "^0.18.11",
+    "typescript": "^5.2.2",
+    "vitest": "^0.28.5"
+  },
+  "scripts": {
+    "build": "make build",
+    "test": "npx vitest --run",
+    "coverage": "npx vitest run --coverage --run",
+    "typecheck": "npx tsc --noEmit"
+  },
+  "sideEffects": false,
+  "main": "./src/index.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "require": "./src/index.ts"
+    },
+    "./state": {
+      "types": "./src/core/index.ts",
+      "import": "./src/core/index.ts",
+      "require": "./src/core/index.ts"
+    }
+  },
+  "dependencies": {
+    "on-change": "^5.0.1"
+  }
+}
