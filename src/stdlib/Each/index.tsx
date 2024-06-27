@@ -60,7 +60,7 @@ export const Each: <T extends ArrayOrObject>(
     const observor = function ({ data, path }: StoreChange) {
       //console.debug("change", changes, path);
 
-      console.log("list change", data, path, value);
+      //console.log("list change", data, path, value);
       const pStep = parentStep.children[0];
       const previousChildren = [...(pStep.children || [])];
       if (data.name === "push") {
