@@ -63,8 +63,9 @@ export const Each: <T extends ArrayOrObject>(
 
       //      console.log("list change", data, path, value);
       const pStep = parentStep.children[0];
-      if (data.name == "push") {
-        const index = (data.result as number) - 1; // push returns index
+      const previousChildren = [...(pStep.children || [])];
+      if (data.name === "push") {
+        const index = (data.result as number) - 1; // push returns new length
         const { treeStep, el } = renderArray(
           pStep,
           props.renderItem,
@@ -72,17 +73,14 @@ export const Each: <T extends ArrayOrObject>(
           value,
           index
         );
-
         const { registry, root } = reifyTree(renderContext, el, pStep);
         addNode(renderContext, pStep, root);
       } else if (data.name === "pop") {
-        if (!pStep || !pStep.children) return;
-        const previousChildren = [...pStep.children];
-
-        const firstNode = previousChildren[0];
-        if (firstNode) removeNode(renderContext, firstNode);
+        if (previousChildren.length > 0) {
+          const lastNode = previousChildren[previousChildren.length - 1];
+          removeNode(renderContext, lastNode);
+        }
       } else if (data.name === "splice") {
-        const previousChildren = [...parentStep.children];
         const [startIndex, deleteCount, ...items] = data.args as [
           number,
           number,
@@ -92,7 +90,11 @@ export const Each: <T extends ArrayOrObject>(
           startIndex,
           startIndex + deleteCount
         );
+
+        // Remove the nodes that are being spliced out
         nodesToRemove.forEach((n) => removeNode(renderContext, n));
+
+        // Add the new nodes being spliced in
         items.forEach((item, i) => {
           const index = startIndex + i;
           const { treeStep, el } = renderArray(
@@ -102,20 +104,10 @@ export const Each: <T extends ArrayOrObject>(
             value,
             index
           );
-          const previousChildren = [...pStep.children];
-          const before = previousChildren[index];
-          console.log("p", {
-            previousChildren,
-            before: before,
-            parentStep,
-            pStep,
-            index,
-          });
           const { registry, root } = reifyTree(renderContext, el, pStep);
+          const before = previousChildren[startIndex + i] || null;
           addNode(renderContext, pStep, root, before);
         });
-        // todo: add nodes at proper position
-        // needs modification of addNode function to take a treestep after which insertion should occur
       }
     };
     const task = { path, observor };
