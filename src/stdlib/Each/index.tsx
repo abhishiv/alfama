@@ -97,6 +97,7 @@ export const Each: <T extends ArrayOrObject>(
         // Add the new nodes being spliced in
         items.forEach((item, i) => {
           const index = startIndex + i;
+          const previousChildren = [...(pStep.children || [])];
           const { treeStep, el } = renderArray(
             pStep,
             props.renderItem,
@@ -106,6 +107,15 @@ export const Each: <T extends ArrayOrObject>(
           );
           const { registry, root } = reifyTree(renderContext, el, pStep);
           const before = previousChildren[startIndex + i] || null;
+          console.log(previousChildren);
+          console.log("before", {
+            startIndex,
+            i,
+            before,
+            pStep,
+            parentStep,
+            root,
+          });
           addNode(renderContext, pStep, root, before);
         });
       }

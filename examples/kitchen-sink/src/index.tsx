@@ -69,8 +69,8 @@ export const Todos = component("Todos", (props, { signal, wire, store }) => {
           json.stats = { count: 0 };
           console.log(json);
           produce($todos.items, (items) => {
-            //items.splice(1, 0, json);
-            items.push(json);
+            items.splice(1, 0, json);
+            //items.push(json);
           });
           (e.target as HTMLFormElement).reset();
         }}
@@ -128,7 +128,7 @@ export const Todos = component("Todos", (props, { signal, wire, store }) => {
 export const Layout = component<{}>(
   "Layout",
   (props, { signal, wire, api }) => {
-    return <Todos />;
+    //    return <Todos />;
     const $count = signal("count", 0);
     const $doubleCount = wire(($) => $count($) * 2); // explicit subscription
 

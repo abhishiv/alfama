@@ -104,11 +104,7 @@ export const addNode = (
     const elementsToInsert = node.dom;
     if (before) {
       const beforeIndex = parentStep.children.indexOf(before);
-      parentStep.children.splice(
-        beforeIndex === 0 ? 0 : beforeIndex - 1,
-        0,
-        node
-      );
+      parentStep.children.splice(beforeIndex, 0, node);
 
       const refNode: HTMLElement = before.dom as HTMLElement;
       refNode.before(elementsToInsert);
