@@ -57,7 +57,6 @@ export const Each: <T extends ArrayOrObject>(
     const path: string[] = getCursor(cursor);
 
     const value: any[] = getValueUsingPath(store.value as any, path) as any[];
-
     const observor = function ({ data, path }: StoreChange) {
       //console.debug("change", changes, path);
 

@@ -267,6 +267,7 @@ export const createStore = <T = unknown>(
       onChange.unsubscribe(observedObject);
     },
   };
+  console.log("storeManager", storeManager);
   const observedObject = onChange(
     obj as Record<any, any>,
     (p, value, previousValue, change) => {
@@ -333,6 +334,7 @@ export const createStore = <T = unknown>(
     observedObject,
     storeManager
   );
+  console.log("store", s);
 
   storeManager.value = observedObject;
   STORE_COUNTER++;
