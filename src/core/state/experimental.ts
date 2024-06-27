@@ -289,6 +289,26 @@ export const createStore = <T = unknown>(
               ["splice", "push", "pop"].indexOf(change.name) > -1
             ) {
               // todo: adjust cursors to handle this case
+              //switch (change.name) {
+              //  case 'insert':
+              //  case 'delete':
+              //  case 'splice':
+              //    manager.wires.forEach(wire => {
+              //      const cursors = wire.storesRS.get(manager);
+              //      if (cursors) {
+              //        const updatedCursors = new Set<string>();
+              //        cursors.forEach(cursorStr => {
+              //          const cursor = decodeCursor(cursorStr);
+              //          // Adjust the cursor path based on the array operation
+              //          // Example: If an element is inserted at index 2, increment indices >= 2
+              //          const updatedCursor = adjustCursorForArrayChange(cursor, change);
+              //          updatedCursors.add(encodeCursor(updatedCursor));
+              //        });
+              //        wire.storesRS.set(manager, updatedCursors);
+              //      }
+              //    });
+              //    break;
+              //}
             }
             if (match) toRun.add(wire);
           }
@@ -320,6 +340,37 @@ export const createStore = <T = unknown>(
 
   return s;
 };
+
+// Function to adjust cursor paths for array changes
+function adjustCursorForArrayChange(cursor: string[], change: any): string[] {
+  const newCursor = [...cursor];
+  const index = parseInt(change.path[change.path.length - 1], 10);
+
+  switch (change.type) {
+    case "insert":
+      if (index <= cursor.length) {
+        newCursor.push(String(index));
+      }
+      break;
+    case "delete":
+      if (index < cursor.length) {
+        newCursor.splice(index, 1);
+      }
+      break;
+    case "splice":
+      const { index: spliceIndex, removed, added } = change;
+      if (spliceIndex <= cursor.length) {
+        newCursor.splice(
+          spliceIndex,
+          removed.length,
+          ...added.map((_: any, i: any) => String(spliceIndex + i))
+        );
+      }
+      break;
+  }
+
+  return newCursor;
+}
 
 export const reify = <T = unknown>(cursor: T): extractGeneric<T> => {
   const s = cursor as unknown as StoreCursor;
