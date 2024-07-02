@@ -53,7 +53,7 @@ const Page = component("HomePage", (props, { signal, wire, store }) => {
   
   // 3) Most importantly: wire reactivity to signals
   // with explicit subscription using the $ token param
-  // Easy to reason about and no untrack/sample related errors
+  // NB: also makes code easy to reason about and prevents those pesky untrack/sample related errors
   const $doubleCount = wire(($) => $count($) * 2); 
   return (
       <div id="home">
