@@ -42,23 +42,24 @@
 
 ```tsx
 /** @jsx h **/
-
 import { component, h, render } from "alfama";
 
-const Page = component<{ name: string }>(
-  "HomePage",
-  (props, { signal, wire }) => {
-    const $count = signal("count", 0);
-    const $doubleCount = wire(($) => $count($) * 2); // explicit subscription
+// 1) The signal/wire/store functions are passed as a param to
+// component definition
+const Page = component("HomePage", (props, { signal, wire, store }) => {
+  
+  // 2) Name signals for rock solid HMR
+  const $count = signal("count", 0);
+  
+  // 3) Most importantly: wire reactivity to signals
+  // with explicit subscription using the $ token param
+  // Easy to reason about and no untrack/sample related errors
+  const $doubleCount = wire(($) => $count($) * 2); 
     return (
       <div id="home">
         <p>Hey, {props.name}</p>
-        <button
-          onClick={() => {
-            $count($count() + 1);
-          }}
-        >
-          Increment to {wire($count)}
+        <button onClick={() => $count($count() + 1)}>
+          Increment / {wire($count)}
         </button>
         <p>Double count = {$doubleCount}</p>
       </div>
