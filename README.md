@@ -1,6 +1,6 @@
 # alfama
 
-Fine grained reactive UI Library.
+⚡ Fine grained reactive UI Library.
 
 [![Version](https://img.shields.io/npm/v/alfama.svg?color=success&style=flat-square)](https://www.npmjs.com/package/alfama)
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
