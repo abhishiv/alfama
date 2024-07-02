@@ -55,7 +55,7 @@ const Page = component("HomePage", (props, { signal, wire, store }) => {
   // with explicit subscription using the $ token param
   // Easy to reason about and no untrack/sample related errors
   const $doubleCount = wire(($) => $count($) * 2); 
-    return (
+  return (
       <div id="home">
         <p>Hey, {props.name}</p>
         <button onClick={() => $count($count() + 1)}>
@@ -63,9 +63,8 @@ const Page = component("HomePage", (props, { signal, wire, store }) => {
         </button>
         <p>Double count = {$doubleCount}</p>
       </div>
-    );
-  }
-);
+  );
+});
 
 render(<Page name="John Doe" />, document.body);
 ```
