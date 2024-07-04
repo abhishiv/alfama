@@ -379,7 +379,7 @@ export const reify = <T = unknown>(cursor: T): extractGeneric<T> => {
   //  console.log({ cursorPath, manager });
   //console.log(JSON.stringify(manager.value));
   const v = getValueUsingPath(manager.value as any, cursorPath);
-  //console.log({ v, cursorPath });
+  //console.log({ v: JSON.stringify(v), cursorPath });
   return v as extractGeneric<T>;
 };
 
