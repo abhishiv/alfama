@@ -280,7 +280,7 @@ export const createStore = <T = unknown>(
         if (cursors) {
           for (var cursorStr of cursors) {
             let match: boolean | undefined;
-            const cursor = decodeCursor(cursorStr);
+            const cursor = cursorStr === "" ? [] : decodeCursor(cursorStr);
             if (change === undefined) {
               match =
                 encodeCursor(changePath.slice(0, cursor.length)) == cursorStr;

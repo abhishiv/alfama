@@ -55,12 +55,12 @@ describe("Basic Implementation of Stores & Wires", (test) => {
 
     const w = createWire(($, wire) => {
       const v = $(s.friends[0].id);
-      console.log(v);
+
       c.log(JSON.stringify(v));
       return v;
     });
     w();
-
+    // ignored since cursor is at  $(s.friends[0].id)
     produce(s.friends, (obj) => {
       obj.push({ id: "2", name: "" });
     });
@@ -69,5 +69,30 @@ describe("Basic Implementation of Stores & Wires", (test) => {
     });
 
     expect(lSpy.mock.calls.length).toBe(2);
+  });
+  // test that wire only runs when subscribed cursors are updated
+  test("Wire at store root", () => {
+    const c = { log: (...v: any[]) => console.log(...v) };
+    const lSpy = vi.spyOn(c, "log");
+    const val: { list: number[] } = {
+      list: [1, 2, 3],
+    };
+    const s = createStore(val);
+
+    const w = createWire(($, wire) => {
+      const v = $(s);
+      c.log("log", JSON.stringify(v));
+      return v;
+    });
+    w();
+
+    produce(s, (obj) => {
+      obj.list = [];
+    });
+    produce(s, (obj) => {
+      obj.list = [2];
+    });
+
+    expect(lSpy.mock.calls.length).toBe(3);
   });
 });

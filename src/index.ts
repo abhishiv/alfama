@@ -5,6 +5,8 @@ export * from "./stdlib/index";
 import { Signal } from "./core";
 import { ComponentUtils } from "./dom";
 
+export { getCursor } from "./utils/index";
+
 export type UsePromiseResp<T = unknown, E = unknown> = {
   $data: Signal<T | undefined>;
   $error: Signal<E | undefined>;
