@@ -1,6 +1,6 @@
 # alfama
 
-Fine grained reactive UI Library.
+⚡ Fine grained reactive UI Library.
 
 [![Version](https://img.shields.io/npm/v/alfama.svg?color=success&style=flat-square)](https://www.npmjs.com/package/alfama)
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
@@ -15,13 +15,13 @@ Fine grained reactive UI Library.
 
 #### Features
 
-- **Small.** Fully featured at `~9kB` gzip.
-- **Truly reactive and fine grained.** Unlike VDOM libraries which use diffing to compute changes, it uses fine grained updates to target only the DOM which needs to update.
-- **No Magic** Explicit subscriptions obviate the need of [`sample`](https://github.com/luwes/sinuous/blob/8d1aa0cdb8a25e6bfcdf34f022523564a9adb533/src/observable.js#L34-L49)/[`untrack`](https://github.com/vobyjs/voby#untrack) methods found in other fine grained reactive libraries like solid/sinuous. _Importantly, many feel that this also makes your code easy to reason about._
-- **Signals and Stores.** Signals for primitives and Stores for deeply nested objects/arrays.
-- **First class HMR** Preserves Signals/Stores across HMR loads for a truly stable HMR experience.
-- **DevEx.** no compile step needed if you want: choose your view syntax: `h` for plain javascript or `<JSX/>` for babel/typescript.
-- **Rich and Complete.** From support for `SVG` to popular patterns like `dangerouslySetInnerHTML`, `ref` to `<Fragment>` and `<Portal />` alfama has you covered.
+- **Small:** Fully featured at `~9kB` gzip.
+- **Truly reactive and fine grained:** Unlike VDOM libraries which use diffing to compute changes, it uses fine grained updates to target only the DOM which needs to update.
+- **No Magic:** Explicit subscriptions obviate the need of [`sample`](https://github.com/luwes/sinuous/blob/8d1aa0cdb8a25e6bfcdf34f022523564a9adb533/src/observable.js#L34-L49)/[`untrack`](https://github.com/vobyjs/voby#untrack) methods found in other fine grained reactive libraries like solid/sinuous. _Importantly, many feel that this also makes your code easy to reason about._
+- **Signals and Stores:** Signals for primitives and Stores for deeply nested objects/arrays.
+- **First class HMR:** Preserves Signals/Stores across HMR loads for a truly stable HMR experience.
+- **DevEx:** no compile step needed if you want: choose your view syntax: `h` for plain javascript or `<JSX/>` for babel/typescript.
+- **Rich and Complete:** From support for `SVG` to popular patterns like `dangerouslySetInnerHTML`, `ref` to `<Fragment>` and `<Portal />` alfama has you covered.
 
 #### Ecosystem
 
@@ -42,29 +42,29 @@ Fine grained reactive UI Library.
 
 ```tsx
 /** @jsx h **/
-
 import { component, h, render } from "alfama";
 
-const Page = component<{ name: string }>(
-  "HomePage",
-  (props, { signal, wire }) => {
-    const $count = signal("count", 0);
-    const $doubleCount = wire(($) => $count($) * 2); // explicit subscription
-    return (
+// 1) The signal/wire/store functions are passed as a param to
+// component definition
+const Page = component("HomePage", (props, { signal, wire, store }) => {
+  
+  // 2) Name signals for rock solid HMR
+  const $count = signal("count", 0);
+  
+  // 3) Most importantly: wire reactivity to signals
+  // with explicit subscription using the $ token param
+  // NB: also makes code easy to reason about and prevents those pesky untrack/sample related errors
+  const $doubleCount = wire(($) => $count($) * 2); 
+  return (
       <div id="home">
         <p>Hey, {props.name}</p>
-        <button
-          onClick={() => {
-            $count($count() + 1);
-          }}
-        >
-          Increment to {wire($count)}
+        <button onClick={() => $count($count() + 1)}>
+          Increment / {wire($count)}
         </button>
         <p>Double count = {$doubleCount}</p>
       </div>
-    );
-  }
-);
+  );
+});
 
 render(<Page name="John Doe" />, document.body);
 ```
