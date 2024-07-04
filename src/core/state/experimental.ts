@@ -272,7 +272,6 @@ export const createStore = <T = unknown>(
     (p, value, previousValue, change) => {
       const changePath = p.split(".");
       const toRun = new Set<Wire>();
-      //console.log("chamge", change, changePath);
       // todo: improve this logic
       const manager = storeManager as StoreManager;
       for (const wire of manager.wires) {
@@ -288,6 +287,8 @@ export const createStore = <T = unknown>(
               change &&
               ["splice", "push", "pop"].indexOf(change.name) > -1
             ) {
+              match =
+                encodeCursor(changePath.slice(0, cursor.length)) == cursorStr;
               // todo: adjust cursors to handle this case
               //switch (change.name) {
               //  case 'insert':
