@@ -282,7 +282,10 @@ export const createStore = <T = unknown>(
             const cursor = cursorStr === "" ? [] : decodeCursor(cursorStr);
             if (change === undefined) {
               match =
-                encodeCursor(changePath.slice(0, cursor.length)) == cursorStr;
+                cursor.length <= changePath.length
+                  ? encodeCursor(changePath.slice(0, cursor.length)) ==
+                    cursorStr
+                  : true;
             } else if (
               change &&
               ["splice", "push", "pop"].indexOf(change.name) > -1
