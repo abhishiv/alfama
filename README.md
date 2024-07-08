@@ -46,9 +46,9 @@ import { component, h, render } from "alfama";
 
 // 1) The signal/wire/store functions are passed as a param to
 // component definition
-const Page = component("HomePage", (props, { signal, wire, store }) => {
+const Page = component("HomePage", (props, { signal, wire }) => {
   
-  // 2) Name signals for rock solid HMR
+  // 2) Named signals for stable HMR 
   const $count = signal("count", 0);
   
   // 3) Most importantly: wire reactivity to signals
