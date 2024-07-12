@@ -23,7 +23,7 @@ export const Portal = component<PortalProps>(
       renderContext,
     }
   ) => {
-    //(parentStep as ComponentTreeStep).mount = props.mount;
+    (parentStep as ComponentTreeStep).mount = props.mount;
     return props.children;
   }
 );
