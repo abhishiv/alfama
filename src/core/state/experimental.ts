@@ -325,10 +325,10 @@ export const createStore = <T = unknown>(
       _runWires(toRun);
       //console.log("manager.tasks", manager.tasks);
       [...manager.tasks].forEach(({ path, observor }) => {
-        console.log(
-          changePath.slice(0, path.length).join("/") === path.join("/"),
-          { path, changePath, change }
-        );
+        //        console.log(
+        //          changePath.slice(0, path.length).join("/") === path.join("/"),
+        //          { path, changePath, change }
+        //        );
         if (changePath.slice(0, path.length).join("/") === path.join("/")) {
           observor({ data: change, path: changePath, value });
         }
