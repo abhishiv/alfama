@@ -54,32 +54,41 @@ export const Each: <T extends ArrayOrObject>(
 
     const cursor = props.cursor;
     const store: StoreManager = (cursor as any)[META_FLAG];
-    const path: string[] = getCursor(cursor);
+    const eachCursorPath: string[] = getCursor(cursor);
+    console.log("Each", eachCursorPath);
 
-    const value: any[] = getValueUsingPath(store.value as any, path) as any[];
+    const value: any[] = getValueUsingPath(
+      store.value as any,
+      eachCursorPath
+    ) as any[];
     const observor = function ({ data, path }: StoreChange) {
-      //console.debug("change", changes, path);
+      // important
+      // filter changes so you don't try to render invalid changes
+      if (path.slice(0, eachCursorPath.length).join("/") !== path.join("/"))
+        return;
 
-      //console.log("list change", data, path, value);
+      //      console.log("list change", data, path, value);
       const pStep = parentStep.children[0];
       const previousChildren = [...(pStep.children || [])];
-      if (data.name === "push") {
-        const index = (data.result as number) - 1; // push returns new length
-        const { treeStep, el } = renderArray(
-          pStep,
-          props.renderItem,
-          cursor,
-          value,
-          index
-        );
-        const { registry, root } = reifyTree(renderContext, el, pStep);
-        addNode(renderContext, pStep, root);
-      } else if (data.name === "pop") {
+      if (data?.name === "push") {
+        data.args.forEach((arg, i) => {
+          const index = previousChildren.length + i; // push returns new length
+          const { treeStep, el } = renderArray(
+            pStep,
+            props.renderItem,
+            cursor,
+            value,
+            index
+          );
+          const { registry, root } = reifyTree(renderContext, el, pStep);
+          addNode(renderContext, pStep, root);
+        });
+      } else if (data?.name === "pop") {
         if (previousChildren.length > 0) {
           const lastNode = previousChildren[previousChildren.length - 1];
           removeNode(renderContext, lastNode);
         }
-      } else if (data.name === "splice") {
+      } else if (data?.name === "splice") {
         const [startIndex, deleteCount, ...items] = data.args as [
           number,
           number,
@@ -106,20 +115,20 @@ export const Each: <T extends ArrayOrObject>(
           );
           const { registry, root } = reifyTree(renderContext, el, pStep);
           const before = previousChildren[startIndex + i] || null;
-          console.log(previousChildren);
-          console.log("before", {
-            startIndex,
-            i,
-            before,
-            pStep,
-            parentStep,
-            root,
-          });
+          //          console.log(previousChildren);
+          //          console.log("before", {
+          //            startIndex,
+          //            i,
+          //            before,
+          //            pStep,
+          //            parentStep,
+          //            root,
+          //          });
           addNode(renderContext, pStep, root, before);
         });
       }
     };
-    const task = { path, observor };
+    const task = { path: eachCursorPath, observor };
     onMount(() => {
       store.tasks.add(task);
     });
@@ -140,9 +149,10 @@ export const Each: <T extends ArrayOrObject>(
       // object
       return (
         <Fragment>
-          {Object.keys(value).map((el, index) =>
-            props.renderItem((cursor as any)[el], el as any)
-          )}
+          {Object.keys(value).map((el, index) => {
+            //            console.log("el", el, index, (cursor as any)[el]);
+            return props.renderItem((cursor as any)[el], el as any);
+          })}
         </Fragment>
       );
     }
@@ -156,6 +166,7 @@ const renderArray = (
   list: any[],
   index: number | string
 ) => {
+  // console.log(getCursor(cursor));
   const vEl = renderItem((cursor as any)[index], index);
   const treeStep = getTreeStep(parentStep, undefined, vEl);
   return { treeStep, el: vEl };

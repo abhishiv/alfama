@@ -1,5 +1,15 @@
 import { assert, expect, test, describe, vi } from "vitest";
-import { createSignal, createWire, createStore, reify, produce } from "./state";
+import {
+  createSignal,
+  createWire,
+  createStore,
+  reify,
+  produce,
+  StoreManager,
+  StoreChange,
+  applyStoreChange,
+} from "./state";
+import { getCursorProxyMeta } from "../utils";
 
 describe("Basic Implementation of Signals & Wires", (test) => {
   test("Signal", () => {
@@ -26,7 +36,7 @@ describe("Nested Signals & Wires", (test) => {
     const sig = createSignal(1);
     const w = createWire(($, wire) => {
       const val = $(sig);
-      console.log("count", val);
+      //      console.log("count", val);
 
       const b = wire(($, wire) => {
         const doubleCount = sig($) * 2;
@@ -94,5 +104,29 @@ describe("Basic Implementation of Stores & Wires", (test) => {
     });
 
     expect(lSpy.mock.calls.length).toBe(3);
+  });
+  test("Test store syncing", () => {
+    const store1 = createStore<{ a?: any; list: any[] }>({ list: [] });
+    const store2 = createStore<{ a?: any; list: any[] }>({ list: [] });
+
+    const store1Manager: StoreManager =
+      getCursorProxyMeta<StoreManager>(store1);
+    const changes: StoreChange[] = [];
+    store1Manager.tasks.add({
+      path: [],
+      observor: (change) => {
+        changes.push(change);
+      },
+    });
+    produce(store1, (state) => {
+      state.a = 4;
+      state.list.push(44);
+    });
+    expect(changes.length).toBe(2);
+    changes.forEach((change) => {
+      applyStoreChange(store2, change);
+    });
+    const store2Value = reify(store2);
+    expect(JSON.stringify(reify(store1))).toBe(JSON.stringify(reify(store2)));
   });
 });

@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "alfama": "0.9.0"
+    "alfama": "*"
   },
   "devDependencies": {
     "typescript": "^5.2.2",

@@ -45,7 +45,10 @@ export type StoreManager<T = unknown> = {
   /** Wires subscribed to this signal */
   wires: Set<Wire<any>>;
   type: typeof Constants.STORE;
-  tasks: Set<{ path: string[]; observor: Function }>;
+  tasks: Set<{
+    path: string[];
+    observor: (change: StoreChange) => void;
+  }>;
   unsubscribe: Function;
 };
 
@@ -320,10 +323,13 @@ export const createStore = <T = unknown>(
       }
       //console.log([...toRun]);
       _runWires(toRun);
-
+      //console.log("manager.tasks", manager.tasks);
       [...manager.tasks].forEach(({ path, observor }) => {
-        //console.log({ path, changePath, change });
-        if (path.join("/") === changePath.join("/")) {
+        console.log(
+          changePath.slice(0, path.length).join("/") === path.join("/"),
+          { path, changePath, change }
+        );
+        if (changePath.slice(0, path.length).join("/") === path.join("/")) {
           observor({ data: change, path: changePath, value });
         }
       });
@@ -433,4 +439,20 @@ const getSubtoken = (wire: Wire): SubToken => {
   token.wire = wire;
   token.type = Constants.SUBTOKEN;
   return token as SubToken;
+};
+
+export const applyStoreChange = (store: CursorProxy, change: StoreChange) => {
+  if (change.data) {
+    produce(getValueUsingPath(store, change.path), (state) => {
+      (state as any)[change.data.name].apply(state, change.data.args);
+    });
+  } else {
+    const tail = change.path[change.path.length - 1];
+    produce(
+      getValueUsingPath(store, change.path.slice(0, change.path.length - 1)),
+      (state) => {
+        state[tail] = change.value;
+      }
+    );
+  }
 };
