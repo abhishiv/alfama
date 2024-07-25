@@ -55,7 +55,7 @@ export const Each: <T extends ArrayOrObject>(
     const cursor = props.cursor;
     const store: StoreManager = (cursor as any)[META_FLAG];
     const eachCursorPath: string[] = getCursor(cursor);
-    console.log("Each", eachCursorPath);
+    //    console.log("Each", eachCursorPath);
 
     const value: any[] = getValueUsingPath(
       store.value as any,
