@@ -10,6 +10,7 @@ import {
   getValueUsingPath,
 } from "../../utils/index";
 import * as Constants from "../constants";
+import { EnumDeclaration, EnumMember, EnumType } from "typescript";
 
 export type { ObjPathProxy } from "../../utils/index";
 export {
@@ -33,8 +34,24 @@ export type Signal<T = unknown> = {
   value: T;
 };
 
-export type StoreCursor<T = unknown, V = StoreManager<T>> = CursorProxy<T, V>;
+export type ExtractElement<ArrayType extends ArrayOrObject> =
+  ArrayType extends readonly (infer ElementType)[]
+    ? ElementType
+    : ArrayType extends { [key: string]: infer ElementType2 }
+    ? ElementType2
+    : never;
+
+export type ArrayOrObject = Array<unknown> | Record<string, unknown>;
+
+export type StoreCursor<T = unknown, TRoot = T> = T extends ArrayOrObject
+  ? {
+      [P in keyof T]: T[P];
+    }
+  : T;
+
 type extractGeneric<Type> = Type extends ObjPathProxy<unknown, infer X>
+  ? X
+  : Type extends StoreCursor<infer X>
   ? X
   : never;
 
@@ -273,7 +290,7 @@ export const createStore = <T = unknown>(
   const observedObject = onChange(
     obj as Record<any, any>,
     (p, value, previousValue, change) => {
-      const changePath = p.split(".");
+      const changePath = p as string[];
       const toRun = new Set<Wire>();
       // todo: improve this logic
       const manager = storeManager as StoreManager;
@@ -336,7 +353,7 @@ export const createStore = <T = unknown>(
 
       // patch == { op:"replace", path="/firstName", value:"Albert"}
     },
-    {}
+    { pathAsArray: true }
   );
   //console.log(observedObject);
   const s = wrapWithCursorProxy<T, StoreManager<T>>(
@@ -348,9 +365,10 @@ export const createStore = <T = unknown>(
   STORE_COUNTER++;
   storeManager.id = "store|" + STORE_COUNTER;
 
-  return s;
+  return s as StoreCursor<T>;
 };
 
+//
 // Function to adjust cursor paths for array changes
 function adjustCursorForArrayChange(cursor: string[], change: any): string[] {
   const newCursor = [...cursor];
@@ -382,25 +400,28 @@ function adjustCursorForArrayChange(cursor: string[], change: any): string[] {
   return newCursor;
 }
 
-export const reify = <T = unknown>(cursor: T): extractGeneric<T> => {
+export const reify = <T = unknown>(cursor: T): T => {
   const s = cursor as unknown as StoreCursor;
-  const manager: StoreManager = getCursorProxyMeta<StoreManager>(s);
+  const manager: StoreManager = getCursorProxyMeta<StoreManager>(
+    s as unknown as ObjPathProxy<unknown, unknown>
+  );
   const cursorPath = getCursor(s);
   //  console.log({ cursorPath, manager });
   //console.log(JSON.stringify(manager.value));
   const v = getValueUsingPath(manager.value as any, cursorPath);
   //console.log({ v: JSON.stringify(v), cursorPath });
-  return v as extractGeneric<T>;
+  return v as T;
 };
 
 export const produce = <T = unknown>(
   cursor: T,
-  setter: (obj: extractGeneric<T>) => void
+  setter: (obj: T) => void
 ): void => {
   const v = reify(cursor);
   setter(v);
 };
 
+//
 const encodeCursor = (cursor: string[]) =>
   cursor.map(encodeURIComponent).join("/");
 const decodeCursor = (str: string) => str.split("/").map(decodeURIComponent);
@@ -413,7 +434,9 @@ const getSubtoken = (wire: Wire): SubToken => {
       const cursor = arg as StoreCursor;
       const cursorPath = getCursor(cursor);
       // todo: improve ts here and remove typecast
-      const manager = getCursorProxyMeta<StoreManager>(cursor);
+      const manager = getCursorProxyMeta<StoreManager>(
+        cursor as unknown as ObjPathProxy<unknown, unknown>
+      );
 
       const encodedCursor = encodeCursor(cursorPath);
 

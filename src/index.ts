@@ -1,6 +1,7 @@
 export * from "./dom";
 export * from "./core/state";
 export * from "./stdlib/index";
+export * from "./utils/index";
 
 import { Signal } from "./core";
 import { ComponentUtils } from "./dom";

@@ -1,3 +1,4 @@
+import { StoreCursor } from "../core";
 import {
   createProxy,
   getPath,
@@ -34,7 +35,7 @@ export const wrapWithCursorProxy = <T = unknown, V = unknown>(
 export const isCursorProxy = (proxy: unknown) =>
   proxy && !!(proxy as CursorProxyInternal)[PATH_FLAG];
 
-export const getCursor = (cursor: CursorProxy) => [
+export const getCursor = (cursor: StoreCursor) => [
   ...(cursor as CursorProxyInternal)[PATH_FLAG],
 ];
 

@@ -39,7 +39,7 @@ export function component<T = any>(
   name: string,
   def: {
     (props: T, helpers: ComponentUtils): VElement;
-  },
+  }
 ): Component<T> {
   (def as Component<T>).__name__ = name;
   return def as Component<T>;
@@ -76,10 +76,10 @@ export const Fragment = component("Fragment", (props) => props.children);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type DistributeWire<T> = T extends any ? Wire<T> : never;
+export type MaybeWire<T> = T | DistributeWire<T>;
 
 export declare namespace h {
   export namespace JSX {
-    export type MaybeWire<T> = T | DistributeWire<T>;
     export type AllowWireForProperties<T> = { [K in keyof T]: MaybeWire<T[K]> };
 
     export type Element = VElement;

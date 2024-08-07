@@ -5,32 +5,22 @@ import {
   StoreCursor,
   StoreManager,
   StoreChange,
+  ArrayOrObject,
+  ExtractElement,
 } from "../../core/state";
 import { h, component, Fragment } from "../../dom/index";
 import { ComponentUtils, VElement } from "../../dom/types";
 import { ParentWireContext } from "../../dom/index";
-import { META_FLAG, getCursor } from "../../utils/index";
+import { META_FLAG, ObjPathProxy, getCursor } from "../../utils/index";
 import { TreeStep } from "../../dom/types";
 import { getUtils, addNode, removeNode } from "../../dom/api";
 import { reifyTree, getTreeStep } from "../../dom/traverser";
 import { getValueUsingPath } from "../../utils/index";
 
-type ArrayOrObject = Array<unknown> | { [key: string]: unknown };
-
-type ExtractElement<ArrayType extends ArrayOrObject> =
-  ArrayType extends readonly (infer ElementType)[]
-    ? ElementType
-    : ArrayType extends { [key: string]: infer ElementType2 }
-    ? ElementType2
-    : never;
-
 export const Each: <T extends ArrayOrObject>(
   props: {
     cursor: StoreCursor<T>;
-    renderItem: (
-      item: StoreCursor<ExtractElement<T>>,
-      index: number
-    ) => VElement;
+    renderItem: (item: ExtractElement<T>, index: number) => VElement;
   },
   utils: ComponentUtils
 ) => VElement = component(
