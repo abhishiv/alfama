@@ -69,9 +69,11 @@ export type StoreManager<T = unknown> = {
   unsubscribe: Function;
 };
 
+export type StoreChangeData = ApplyData;
+
 export type StoreChange = {
   path: string[];
-  data: ApplyData;
+  data: StoreChangeData;
   value: any;
 };
 
@@ -233,16 +235,14 @@ const _runWires = (wires: Set<Wire<any>>): void => {
   toRun.forEach((wire) => {
     const previousValue = wire.value;
     const val = runWire(wire.fn, wire.token, wire.subWire);
-    //console.log("val", val, previousValue);
+
     wire.run = wire.run + 1;
     if (val === previousValue) return;
-    //console.log("www", wire.value, previousValue, wire);
-    //if (wire.value !== previousValue) {
+
     wire.value = val;
     for (const task of wire.tasks) {
       task(val);
     }
-    //}
   });
 };
 
@@ -290,6 +290,7 @@ export const createStore = <T = unknown>(
   const observedObject = onChange(
     obj as Record<any, any>,
     (p, value, previousValue, change) => {
+      console.log(p, change, value);
       const changePath = p as string[];
       const toRun = new Set<Wire>();
       // todo: improve this logic
@@ -338,24 +339,18 @@ export const createStore = <T = unknown>(
           }
         }
       }
-      //console.log([...toRun]);
+
       _runWires(toRun);
-      //console.log("manager.tasks", manager.tasks);
+
       [...manager.tasks].forEach(({ path, observor }) => {
-        //        console.log(
-        //          changePath.slice(0, path.length).join("/") === path.join("/"),
-        //          { path, changePath, change }
-        //        );
         if (changePath.slice(0, path.length).join("/") === path.join("/")) {
           observor({ data: change, path: changePath, value });
         }
       });
-
-      // patch == { op:"replace", path="/firstName", value:"Albert"}
     },
     { pathAsArray: true }
   );
-  //console.log(observedObject);
+
   const s = wrapWithCursorProxy<T, StoreManager<T>>(
     observedObject,
     storeManager
@@ -470,12 +465,21 @@ export const applyStoreChange = (store: CursorProxy, change: StoreChange) => {
       (state as any)[change.data.name].apply(state, change.data.args);
     });
   } else {
-    const tail = change.path[change.path.length - 1];
-    produce(
-      getValueUsingPath(store, change.path.slice(0, change.path.length - 1)),
-      (state) => {
-        state[tail] = change.value;
-      }
-    );
+    if (change.path.length === 0) {
+      produce(store, (s) => {
+        const v = change.value || {};
+        Object.keys(v).forEach((k) => {
+          (s as any)[k] = v[k];
+        });
+      });
+    } else {
+      const tail = change.path[change.path.length - 1];
+      produce(
+        getValueUsingPath(store, change.path.slice(0, change.path.length - 1)),
+        (state) => {
+          state[tail] = change.value;
+        }
+      );
+    }
   }
 };

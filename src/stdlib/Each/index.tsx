@@ -20,7 +20,7 @@ import { getValueUsingPath } from "../../utils/index";
 export const Each: <T extends ArrayOrObject>(
   props: {
     cursor: StoreCursor<T>;
-    renderItem: (item: ExtractElement<T>, index: number) => VElement;
+    renderItem: (item: ExtractElement<T>, index: number | string) => VElement;
   },
   utils: ComponentUtils
 ) => VElement = component(
@@ -51,71 +51,83 @@ export const Each: <T extends ArrayOrObject>(
       store.value as any,
       eachCursorPath
     ) as any[];
+    const isArray = Array.isArray(value);
+
     const observor = function ({ data, path }: StoreChange) {
+      //    console.log("list change", data, path, value);
+      //      console.log(path.slice(0, eachCursorPath.length).join("/"));
       // important
       // filter changes so you don't try to render invalid changes
-      if (path.slice(0, eachCursorPath.length).join("/") !== path.join("/"))
-        return;
-
-      //      console.log("list change", data, path, value);
       const pStep = parentStep.children[0];
       const previousChildren = [...(pStep.children || [])];
-      if (data?.name === "push") {
-        data.args.forEach((arg, i) => {
-          const index = previousChildren.length + i; // push returns new length
-          const { treeStep, el } = renderArray(
-            pStep,
-            props.renderItem,
-            cursor,
-            value,
-            index
+      if (isArray) {
+        if (path.slice(0, eachCursorPath.length).join("/") !== path.join("/"))
+          return;
+        if (data?.name === "push") {
+          data.args.forEach((arg, i) => {
+            const index = previousChildren.length + i;
+            const { treeStep, el } = renderArray(
+              pStep,
+              props.renderItem,
+              cursor,
+              value,
+              index
+            );
+            const { registry, root } = reifyTree(renderContext, el, pStep);
+            addNode(renderContext, pStep, root);
+          });
+        } else if (data?.name === "pop") {
+          if (previousChildren.length > 0) {
+            const lastNode = previousChildren[previousChildren.length - 1];
+            removeNode(renderContext, lastNode);
+          }
+        } else if (data?.name === "splice") {
+          const [startIndex, deleteCount, ...items] = data.args as [
+            number,
+            number,
+            ...any
+          ];
+          const nodesToRemove = previousChildren.slice(
+            startIndex,
+            startIndex + deleteCount
           );
+
+          // Remove the nodes that are being spliced out
+          nodesToRemove.forEach((n) => removeNode(renderContext, n));
+
+          // Add the new nodes being spliced in
+          items.forEach((item, i) => {
+            const index = startIndex + i;
+            const previousChildren = [...(pStep.children || [])];
+            const { treeStep, el } = renderArray(
+              pStep,
+              props.renderItem,
+              cursor,
+              value,
+              index
+            );
+            const { registry, root } = reifyTree(renderContext, el, pStep);
+            const before = previousChildren[startIndex + i] || null;
+            addNode(renderContext, pStep, root, before);
+          });
+        }
+      } else {
+        //        console.log("path", path, eachCursorPath);
+        if (
+          path.length === eachCursorPath.length + 1 &&
+          path.slice(0, eachCursorPath.length).join("/") ==
+            eachCursorPath.join("/")
+        ) {
+          // todo: handle removal
+          const key = path[path.length - 1];
+
+          const index = previousChildren.length + 1;
+          const el = props.renderItem((cursor as any)[key], key);
+          const treeStep = getTreeStep(parentStep, undefined, el);
+
           const { registry, root } = reifyTree(renderContext, el, pStep);
           addNode(renderContext, pStep, root);
-        });
-      } else if (data?.name === "pop") {
-        if (previousChildren.length > 0) {
-          const lastNode = previousChildren[previousChildren.length - 1];
-          removeNode(renderContext, lastNode);
         }
-      } else if (data?.name === "splice") {
-        const [startIndex, deleteCount, ...items] = data.args as [
-          number,
-          number,
-          ...any
-        ];
-        const nodesToRemove = previousChildren.slice(
-          startIndex,
-          startIndex + deleteCount
-        );
-
-        // Remove the nodes that are being spliced out
-        nodesToRemove.forEach((n) => removeNode(renderContext, n));
-
-        // Add the new nodes being spliced in
-        items.forEach((item, i) => {
-          const index = startIndex + i;
-          const previousChildren = [...(pStep.children || [])];
-          const { treeStep, el } = renderArray(
-            pStep,
-            props.renderItem,
-            cursor,
-            value,
-            index
-          );
-          const { registry, root } = reifyTree(renderContext, el, pStep);
-          const before = previousChildren[startIndex + i] || null;
-          //          console.log(previousChildren);
-          //          console.log("before", {
-          //            startIndex,
-          //            i,
-          //            before,
-          //            pStep,
-          //            parentStep,
-          //            root,
-          //          });
-          addNode(renderContext, pStep, root, before);
-        });
       }
     };
     const task = { path: eachCursorPath, observor };
@@ -126,7 +138,7 @@ export const Each: <T extends ArrayOrObject>(
       store.tasks.delete(task);
     });
 
-    if (Array.isArray(value)) {
+    if (isArray) {
       // array
       return (
         <Fragment>
