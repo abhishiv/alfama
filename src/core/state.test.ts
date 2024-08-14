@@ -19,6 +19,16 @@ describe("Basic Implementation of Signals & Wires", (test) => {
     expect(sig()).toBe(val);
   });
 
+  test("Signal with array destructuring", () => {
+    const val = 1;
+    const sig = createSignal(val);
+    expect(sig).toBeDefined();
+    const [getValue, setValue] = sig;
+    expect(getValue()).toBe(val);
+    setValue(3);
+    expect(getValue()).toBe(3);
+  });
+
   test("Wire", () => {
     const sig = createSignal(2);
     const w = createWire(($, wire) => {

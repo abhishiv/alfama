@@ -32,6 +32,7 @@ export type Signal<T = unknown> = {
   type: typeof Constants.SIGNAL;
 
   value: T;
+  [Symbol.iterator]: any;
 };
 
 export type ExtractElement<ArrayType extends ArrayOrObject> =
@@ -247,24 +248,43 @@ const _runWires = (wires: Set<Wire<any>>): void => {
 };
 
 export const createSignal = <T = any>(val: T): Signal<T> => {
-  const s: Partial<Signal> = function (arg?: T) {
-    const sig = s as Signal;
-    if (arguments.length == 0) {
-      return s.value;
-    } else if (
-      arg &&
-      (arg as unknown as SubToken).type === Constants.SUBTOKEN
-    ) {
+  function get(arg?: SubToken) {
+    if (arg) {
+      const sig = s as Signal;
       const token = arg as unknown as SubToken;
       // Two-way link. Signal writes will now call/update wire W
       token.wire.sigRS.add(sig);
       sig.wires.add(token.wire);
       return s.value;
     } else {
-      s.value = arg;
-      _runWires(sig.wires);
-      return val;
+      return s.value;
     }
+  }
+
+  function set(arg: T) {
+    const sig = s as Signal;
+    s.value = arg;
+    _runWires(sig.wires);
+    return val;
+  }
+
+  const s: Partial<Signal> = function (arg?: T) {
+    const sig = s as Signal;
+    if (arguments.length == 0) {
+      return get();
+    } else if (
+      arg &&
+      (arg as unknown as SubToken).type === Constants.SUBTOKEN
+    ) {
+      return get(arg as unknown as SubToken);
+    } else {
+      return set(arg as T);
+    }
+  };
+
+  s[Symbol.iterator] = function* () {
+    yield get;
+    yield set;
   };
   SIGNAL_COUNTER++;
   s.id = "signal|" + SIGNAL_COUNTER;
@@ -290,7 +310,7 @@ export const createStore = <T = unknown>(
   const observedObject = onChange(
     obj as Record<any, any>,
     (p, value, previousValue, change) => {
-      console.log(p, change, value);
+      //console.log(p, change, value);
       const changePath = p as string[];
       const toRun = new Set<Wire>();
       // todo: improve this logic
