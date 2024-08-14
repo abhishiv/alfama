@@ -18,7 +18,7 @@ export {
   getCursor as getProxyPath,
 } from "../../utils/index";
 
-type GetterSignal<T> = (arg?: SubToken) => T;
+type GetterSignal<T = any> = (arg?: SubToken) => T;
 type SetterSignal<T> = (newValue: T) => void;
 
 export type Signal<T = unknown> = {
@@ -163,8 +163,9 @@ export const createWire: WireFactory = (arg) => {
   return w as Wire;
 };
 
+// todo: think about how to handle this with getter
 const runWire = (
-  arg: WireFunction | Signal | StoreCursor,
+  arg: WireFunction | Signal | StoreCursor | GetterSignal,
   token: SubToken,
   subWireFactory: WireFactory
 ) => {
