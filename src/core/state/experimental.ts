@@ -18,6 +18,9 @@ export {
   getCursor as getProxyPath,
 } from "../../utils/index";
 
+type GetterSignal<T> = (arg?: SubToken) => T;
+type SetterSignal<T> = (newValue: T) => void;
+
 export type Signal<T = unknown> = {
   id: string;
   (): T;
@@ -32,7 +35,7 @@ export type Signal<T = unknown> = {
   type: typeof Constants.SIGNAL;
 
   value: T;
-  [Symbol.iterator]: any;
+  [Symbol.iterator](): Iterator<any, any, any>;
 };
 
 export type ExtractElement<ArrayType extends ArrayOrObject> =
