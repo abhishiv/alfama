@@ -35,7 +35,7 @@ export type Signal<T = unknown> = {
   type: typeof Constants.SIGNAL;
 
   value: T;
-  [Symbol.iterator](): Iterator<any, any, any>;
+  [Symbol.iterator](): IterableIterator<GetterSignal<T> | SetterSignal<T>>;
 };
 
 export type ExtractElement<ArrayType extends ArrayOrObject> =
