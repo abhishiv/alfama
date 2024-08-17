@@ -83,10 +83,12 @@ type WireState = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 export type Wire<T = unknown> = {
   id: string;
   /** Run the wire */
-  (): T;
+  run: () => T;
+  (token: SubToken): T;
   fn: WireFunction<T>; //| StoreCursor;
   /** Signals read-subscribed last run */
   sigRS: Set<Signal>;
+  wiresRS: Set<Wire>;
   storesRS: WeakMap<StoreManager, Set<string>>;
   /** Post-run tasks */
   tasks: Set<(nextValue: T) => void>;
@@ -96,7 +98,7 @@ export type Wire<T = unknown> = {
   lower: Set<Wire>;
   /** FSM state 3-bit bitmask: [RUNNING][SKIP_RUN_QUEUE][NEEDS_RUN] */
   /** Run count */
-  run: number;
+  runCount: number;
   value?: T;
   /** To check "if x is a wire" */
   type: typeof Constants.WIRE;
@@ -115,7 +117,7 @@ export type SubToken = {
 };
 
 export type WireFunction<T = unknown> = {
-  ($: SubToken, wire: WireFactory): T;
+  ($: SubToken, params: { wire: WireFactory; previousValue?: T }): T;
 };
 
 export type WireFactory<T = any> = (
@@ -133,10 +135,8 @@ let WIRE_COUNTER = 0;
 let STORE_COUNTER = 0;
 
 export const createWire: WireFactory = (arg) => {
-  const w: Partial<Wire> = () => {
-    const val = runWire(arg, $, subWireFactory);
-    // Clean up unused nested wires
-    return val;
+  const w: Partial<Wire> = (token: SubToken) => {
+    // todo wires should be rs to other wires
   };
   const subWireFactory: WireFactory = (subFn) => {
     const subWire = createWire(subFn);
@@ -148,10 +148,16 @@ export const createWire: WireFactory = (arg) => {
   WIRE_COUNTER++;
   w.id = "wire|" + WIRE_COUNTER;
   w.sigRS = new Set();
+  w.wiresRS = new Set();
   w.storesRS = new WeakMap();
   w.tasks = new Set();
   w.lower = new Set();
-  w.run = 0;
+  w.runCount = 0;
+  w.run = () => {
+    const val = runWire(arg, $, subWireFactory);
+    // Clean up unused nested wires
+    return val;
+  };
   w.type = Constants.WIRE;
   w.fn = arg;
   w.token = $;
@@ -178,7 +184,10 @@ const runWire = (
     return v;
   } else {
     const fn = arg as WireFunction;
-    const v = fn(token, subWireFactory);
+    const v = fn(token, {
+      wire: subWireFactory,
+      previousValue: token.wire.value,
+    });
     token.wire.value = v;
     return v;
   }
@@ -236,7 +245,7 @@ const _runWires = (wires: Set<Wire<any>>): void => {
     const previousValue = wire.value;
     const val = runWire(wire.fn, wire.token, wire.subWire);
 
-    wire.run = wire.run + 1;
+    wire.runCount = wire.runCount + 1;
     if (val === previousValue) return;
 
     wire.value = val;
@@ -290,7 +299,6 @@ export const createStore = <T = unknown>(
   const observedObject = onChange(
     obj as Record<any, any>,
     (p, value, previousValue, change) => {
-      console.log(p, change, value);
       const changePath = p as string[];
       const toRun = new Set<Wire>();
       // todo: improve this logic

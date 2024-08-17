@@ -407,7 +407,6 @@ export declare type GenericEventAttrs<Target extends EventTarget> = {
 // Note: HTML elements will also need GenericEventAttributes
 export declare type HTMLAttrs = {
   dangerouslySetInnerHTML?: { __html: string };
-  ref?: (el: any) => void;
 
   // Standard HTML Attributes
   accept?: string;

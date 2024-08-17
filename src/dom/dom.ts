@@ -42,12 +42,12 @@ export const createDOMNode = (
   // wire: create text node from wire output
   if (step.type == DOMConstants.WireTreeStep) {
     const wire = step.node as Wire;
-    const value = wire();
+    const value = wire.run();
     let childEL: Node | undefined = undefined;
     if (
       ["string", "number", "boolean", "undefined"].indexOf(typeof value) > -1
     ) {
-      childEL = createTextNode(wire() + "");
+      childEL = createTextNode(wire.run() + "");
       wire.tasks.add((val: any) => {
         childEL ? (childEL.textContent = val) : null;
       });
@@ -93,7 +93,7 @@ export const createDOMNode = (
         } else {
           if (value && value.type === Constants.WIRE) {
             const w: Wire<string> = value;
-            const val = w();
+            const val = w.run();
             setAttributeValue(el, finalKey, val);
             w.tasks.add((val) => {
               setAttributeValue(el, finalKey, val);

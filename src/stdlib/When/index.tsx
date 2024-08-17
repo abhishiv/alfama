@@ -35,7 +35,7 @@ export const When = component<WhenProps>(
     const rootWire = wire(($: SubToken) => {});
     setContext(ParentWireContext, signal("$wire", rootWire));
     const underlying = utils.wire(props.condition);
-    const value = underlying();
+    const value = underlying.run();
     const getView = (value: any) =>
       props.views[value as unknown as any] || props.fallback;
     const task = (value: any) => {
