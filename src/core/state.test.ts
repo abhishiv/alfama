@@ -34,7 +34,7 @@ describe("Basic Implementation of Signals & Wires", (test) => {
       const val = getValue($);
       return val;
     });
-    expect(w()).toBe(getValue());
+    expect(w.run()).toBe(getValue());
   });
 });
 
@@ -43,19 +43,17 @@ describe("Nested Signals & Wires", (test) => {
     const c = { log: (...v: any[]) => console.log(...v) };
     const lSpy = vi.spyOn(c, "log");
     const [get, set] = createSignal(1);
-    const w = createWire(($, wire) => {
+    const w = createWire(($, { wire }) => {
       const val = get($);
-      //      console.log("count", val);
-
-      const b = wire(($, wire) => {
+      const b = wire(($, { wire: w }) => {
         const doubleCount = get($) * 2;
         c.log("doublecount", doubleCount);
         return val;
       });
-      b();
+      b.run();
       return val;
     });
-    w();
+    w.run();
     set(4);
     expect(lSpy.mock.calls.length).toBe(2);
   });
@@ -78,7 +76,7 @@ describe("Basic Implementation of Stores & Wires", (test) => {
       c.log(JSON.stringify(v));
       return v;
     });
-    w();
+    w.run();
     // ignored since cursor is at  $(s.friends[0].id)
     produce(s.friends, (obj) => {
       obj.push({ id: "2", name: "" });
@@ -103,7 +101,7 @@ describe("Basic Implementation of Stores & Wires", (test) => {
       c.log("log", JSON.stringify(v));
       return v;
     });
-    w();
+    w.run();
 
     produce(s, (obj) => {
       obj.list = [];
