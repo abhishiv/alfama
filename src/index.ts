@@ -32,16 +32,16 @@ export function usePromise<T = unknown, E = unknown>(
   );
   promise()
     .then((data) => {
-      $data(data);
-      $status("loaded");
-      $loading(false);
+      $data.set(data);
+      $status.set("loaded");
+      $loading.set(false);
     })
     .catch((err) => {
       console.log(err, err.message);
-      $data(undefined);
-      $error(err.message);
-      $status("failed");
-      $loading(undefined);
+      $data.set(undefined);
+      $error.set(err.message);
+      $status.set("failed");
+      $loading.set(undefined);
     });
   return { $data, $loading, $error, $status };
 }

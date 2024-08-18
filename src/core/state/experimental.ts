@@ -29,12 +29,6 @@ export type SignalAPI<T = any> = [SignalGetter<T>, SignalSetter<T>];
 
 export type Signal<T = unknown> = SignalAPI & {
   id: string;
-  (): T;
-  /** Write value; notifying wires */
-  // Ordered before ($):T for TS to work
-  (value: T): void;
-  /** Read value & subscribe */
-  ($: SubToken): T;
   /** Wires subscribed to this signal */
   wires: Set<Wire<any>>;
   /** To check "if x is a signal" */
@@ -96,7 +90,7 @@ export type Wire<T = unknown> = {
   /** Run the wire */
   run: () => T;
   (token: SubToken): T;
-  fn: WireFunction<T>; //| StoreCursor;
+  fn: any; //WireFunction<T>; //| StoreCursor;
   /** Signals read-subscribed last run */
   sigRS: Set<Signal>;
   wiresRS: Set<Wire>;
@@ -486,12 +480,12 @@ const getSubtoken = (wire: Wire): SubToken => {
       return v;
     } else if ((arg as Signal).type === Constants.SIGNAL) {
       const sig = arg as Signal;
-      const v = sig(token);
+      const v = sig.get(token as SubToken);
       wire.value = v;
       return v;
     } else if ((arg as SignalGetter).type === Constants.SIGNAL_GETTER) {
       const sig = (arg as SignalGetter).sig as Signal;
-      const v = sig(token);
+      const v = sig.get(token as SubToken);
       wire.value = v;
       return v;
     }
