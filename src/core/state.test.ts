@@ -23,10 +23,10 @@ describe("Basic Implementation of Signals & Wires", (test) => {
     const val = 1;
     const sig = createSignal(val);
     expect(sig).toBeDefined();
-    const [getValue, setValue] = sig;
-    expect(getValue()).toBe(val);
-    setValue(3);
-    expect(getValue()).toBe(3);
+    const $sig = sig;
+    expect($sig.get()).toBe(val);
+    $sig.set(3);
+    expect($sig.get()).toBe(3);
   });
 
   test("Wire", () => {

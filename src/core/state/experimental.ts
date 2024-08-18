@@ -18,8 +18,8 @@ export {
   getCursor as getProxyPath,
 } from "../../utils/index";
 
-type GetterSignal<T = any> = (arg?: SubToken) => T;
-type SetterSignal<T> = (newValue: T) => void;
+type SignalGetter<T = any> = (arg?: SubToken) => T;
+type SignalSetter<T> = (newValue: T) => void;
 
 export type Signal<T = unknown> = {
   id: string;
@@ -35,7 +35,8 @@ export type Signal<T = unknown> = {
   type: typeof Constants.SIGNAL;
 
   value: T;
-  [Symbol.iterator](): IterableIterator<GetterSignal<T> | SetterSignal<T>>;
+  get: SignalGetter<T>;
+  set: SignalSetter<T>;
 };
 
 export type ExtractElement<ArrayType extends ArrayOrObject> =
@@ -165,7 +166,7 @@ export const createWire: WireFactory = (arg) => {
 
 // todo: think about how to handle this with getter
 const runWire = (
-  arg: WireFunction | Signal | StoreCursor | GetterSignal,
+  arg: WireFunction | Signal | StoreCursor | SignalGetter,
   token: SubToken,
   subWireFactory: WireFactory
 ) => {
@@ -259,9 +260,9 @@ export const createSignal = <T = any>(val: T): Signal<T> => {
       // Two-way link. Signal writes will now call/update wire W
       token.wire.sigRS.add(sig);
       sig.wires.add(token.wire);
-      return s.value;
+      return s.value as T;
     } else {
-      return s.value;
+      return s.value as T;
     }
   }
 
@@ -272,7 +273,7 @@ export const createSignal = <T = any>(val: T): Signal<T> => {
     return val;
   }
 
-  const s: Partial<Signal> = function (arg?: T) {
+  const s: Partial<Signal<T>> = function (arg?: T) {
     const sig = s as Signal;
     if (arguments.length == 0) {
       return get();
@@ -286,10 +287,12 @@ export const createSignal = <T = any>(val: T): Signal<T> => {
     }
   };
 
-  s[Symbol.iterator] = function* () {
-    yield get;
-    yield set;
-  };
+  // https://stackoverflow.com/a/78367121
+  // Define a tuple for iterable values
+  const iterablePayload = [get, set] as const;
+  s.get = get;
+  s.set = set as SignalSetter<T>;
+
   SIGNAL_COUNTER++;
   s.id = "signal|" + SIGNAL_COUNTER;
   s.value = val;
