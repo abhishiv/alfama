@@ -21,7 +21,9 @@ export {
 type SignalGetter<T = any> = (arg?: SubToken) => T;
 type SignalSetter<T> = (newValue: T) => void;
 
-export type Signal<T = unknown> = {
+export type SignalAPI<T = any> = [SignalGetter<T>, SignalSetter<T>];
+
+export type Signal<T = unknown> = SignalAPI & {
   id: string;
   (): T;
   /** Write value; notifying wires */
@@ -273,19 +275,7 @@ export const createSignal = <T = any>(val: T): Signal<T> => {
     return val;
   }
 
-  const s: Partial<Signal<T>> = function (arg?: T) {
-    const sig = s as Signal;
-    if (arguments.length == 0) {
-      return get();
-    } else if (
-      arg &&
-      (arg as unknown as SubToken).type === Constants.SUBTOKEN
-    ) {
-      return get(arg as unknown as SubToken);
-    } else {
-      return set(arg as T);
-    }
-  };
+  const s: any = [get, set];
 
   // https://stackoverflow.com/a/78367121
   // Define a tuple for iterable values

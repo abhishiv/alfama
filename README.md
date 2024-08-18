@@ -48,17 +48,17 @@ import { component, h, render } from "alfama";
 // component definition
 const Page = component("HomePage", (props, { signal, wire }) => {
   // 2) Named signals for stable HMR
-  const $count = signal("count", 0);
+  const [count, setCount] = signal("count", 0);
 
   // 3) Most importantly: wire reactivity to signals
   // with explicit subscription using the $ token param
   // NB: also makes code easy to reason about and prevents those pesky untrack/sample related errors
-  const $doubleCount = wire(($) => $count.get($) * 2);
+  const $doubleCount = wire(($) => count($) * 2);
 
   return (
     <div id="home">
       <p>Hey, {props.name}</p>
-      <button onClick={() =>  $count.set($count.get() + 1)}>
+      <button onClick={() => setCount(count() + 1)}>
         Increment / {wire(count)} // or wire(($) => $(count))
       </button>
       <p>Double count = {$doubleCount}</p>
@@ -88,7 +88,7 @@ It's also influenced by Sinuous, Solid, & S.js
 export const HomePage = component<{ name: string }>(
   "HomePage",
   (props, { signal, wire }) => {
-    const $count = signal("count", 0);
+    const [count, setCount] = signal("count", 0);
     //.. rest of component
   }
 );
@@ -102,10 +102,10 @@ export const HomePage = component<{ name: string }>(
 <div id="home">
   <button
     onclick={() => {
-      $count.set($count.get() + 1);
+      setCount(count() + 1);
     }}
   >
-    Increment to {wire(($) => $count.get($))}
+    Increment to {wire(($) => $(count))}
   </button>
 </div>
 ```
@@ -238,18 +238,18 @@ export const Prosemirror = component("Prosemirror", (props, { onUnmount }) => {
 
 ```tsx
 export const PortalExample = component("PortalExample", (props, utils) => {
-  const $active = utils.signal("active", false);
+  const [active, setActive] = utils.signal("active", false);
   return (
     <div>
       <button
         onClick={(e) => {
-          $active.set(!$active.get());
+          setActive(!active());
         }}
       >
         toggle modal
       </button>
       <When
-        condition={($) => $active.set($)}
+        condition={($) => active($)}
         views={{
           true: () => {
             return (
@@ -344,10 +344,10 @@ export const Prosemirror = component("Prosemirror", (props, { onUnmount }) => {
 These are reactive read/write variables who notify subscribers when they've been written to. They act as dispatchers in the reactive system.
 
 ```tsx
-const $count = signal("count", 0);
+const [count, setCount] = signal("count", 0);
 
-$count.get(); // Passive read (read-pass)
-$count.set(1); // Write
+count(); // Passive read (read-pass)
+setCount(1); // Write
 ```
 
 The subscribers to signals are wires, which will be introduced later. They subscribe by read-subscribing the signal.
@@ -376,7 +376,7 @@ These are task runners who subscribe to signals/stores and react to writes. They
 ```tsx
 wire(($) => {
   // Explicitly subscribe to count signal using the subtoken "$"
-  const count = $count.get($); // or count($)
+  const countValue = $(count); // or count($)
 
   // also possible to subscribe to a stores using "$" subtoken
   const friendsCount = $($profile.friends);

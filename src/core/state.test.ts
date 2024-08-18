@@ -14,28 +14,27 @@ import { getCursorProxyMeta } from "../utils";
 describe("Basic Implementation of Signals & Wires", (test) => {
   test("Signal", () => {
     const val = 1;
-    const sig = createSignal(val);
-    expect(sig).toBeDefined();
-    expect(sig()).toBe(val);
+    const [getValue, setValue] = createSignal<number>(val);
+    expect(getValue()).toBe(val);
   });
 
   test("Signal with array destructuring", () => {
     const val = 1;
-    const sig = createSignal(val);
+    const sig = createSignal<number>(val);
     expect(sig).toBeDefined();
-    const $sig = sig;
-    expect($sig.get()).toBe(val);
-    $sig.set(3);
-    expect($sig.get()).toBe(3);
+    const [getValue, setValue] = sig;
+    expect(getValue()).toBe(val);
+    setValue(3);
+    expect(getValue()).toBe(3);
   });
 
   test("Wire", () => {
-    const sig = createSignal(2);
+    const [getValue, setValue] = createSignal<number>(2);
     const w = createWire(($, wire) => {
-      const val = $(sig);
+      const val = getValue($);
       return val;
     });
-    expect(w()).toBe(sig());
+    expect(w()).toBe(getValue());
   });
 });
 
@@ -43,13 +42,13 @@ describe("Nested Signals & Wires", (test) => {
   test("Nested Wires should cleanup and not fire multiple times in case of nested wires", () => {
     const c = { log: (...v: any[]) => console.log(...v) };
     const lSpy = vi.spyOn(c, "log");
-    const sig = createSignal(1);
+    const [get, set] = createSignal(1);
     const w = createWire(($, wire) => {
-      const val = $(sig);
+      const val = get($);
       //      console.log("count", val);
 
       const b = wire(($, wire) => {
-        const doubleCount = sig($) * 2;
+        const doubleCount = get($) * 2;
         c.log("doublecount", doubleCount);
         return val;
       });
@@ -57,7 +56,7 @@ describe("Nested Signals & Wires", (test) => {
       return val;
     });
     w();
-    sig(4);
+    set(4);
     expect(lSpy.mock.calls.length).toBe(2);
   });
 });
