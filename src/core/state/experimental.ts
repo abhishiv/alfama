@@ -18,7 +18,11 @@ export {
   getCursor as getProxyPath,
 } from "../../utils/index";
 
-type SignalGetter<T = any> = (arg?: SubToken) => T;
+type SignalGetter<T = any> = {
+  (arg?: SubToken): T;
+  type: typeof Constants.SIGNAL_GETTER;
+  sig: Signal<T>;
+};
 type SignalSetter<T> = (newValue: T) => void;
 
 export type SignalAPI<T = any> = [SignalGetter<T>, SignalSetter<T>];
@@ -124,7 +128,10 @@ export type SubToken = {
 };
 
 export type WireFunction<T = unknown> = {
-  ($: SubToken, params: { wire: WireFactory; previousValue?: T }): T;
+  (
+    $: SubToken,
+    params: { createWire: WireFactory; wire: WireFactory; previousValue?: T }
+  ): T;
 };
 
 export type WireFactory<T = any> = (
@@ -190,9 +197,15 @@ const runWire = (
     const v = token(sig);
     token.wire.value = v;
     return v;
+  } else if ((arg as SignalGetter).type === Constants.SIGNAL_GETTER) {
+    const sig = (arg as SignalGetter).sig;
+    const v = token(sig);
+    token.wire.value = v;
+    return v;
   } else {
     const fn = arg as WireFunction;
     const v = fn(token, {
+      createWire: subWireFactory,
       wire: subWireFactory,
       previousValue: token.wire.value,
     });
@@ -286,9 +299,6 @@ export const createSignal = <T = any>(val: T): Signal<T> => {
 
   const s: any = [get, set];
 
-  // https://stackoverflow.com/a/78367121
-  // Define a tuple for iterable values
-  const iterablePayload = [get, set] as const;
   s.get = get;
   s.set = set as SignalSetter<T>;
 
@@ -448,7 +458,9 @@ const decodeCursor = (str: string) => str.split("/").map(decodeURIComponent);
 
 // todo: figure how to annotate values from store.cursor with Symbol
 const getSubtoken = (wire: Wire): SubToken => {
-  const token: Partial<SubToken> = (arg: Signal | StoreCursor) => {
+  const token: Partial<SubToken> = (
+    arg: Signal | StoreCursor | SignalGetter | Wire
+  ) => {
     //console.log("arg", arg);
     if (isCursorProxy(arg)) {
       const cursor = arg as StoreCursor;
@@ -472,8 +484,13 @@ const getSubtoken = (wire: Wire): SubToken => {
       //console.log("v", v);
       wire.value = v;
       return v;
-    } else {
+    } else if ((arg as Signal).type === Constants.SIGNAL) {
       const sig = arg as Signal;
+      const v = sig(token);
+      wire.value = v;
+      return v;
+    } else if ((arg as SignalGetter).type === Constants.SIGNAL_GETTER) {
+      const sig = (arg as SignalGetter).sig as Signal;
       const v = sig(token);
       wire.value = v;
       return v;
