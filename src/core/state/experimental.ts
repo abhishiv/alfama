@@ -18,7 +18,12 @@ export {
   getCursor as getProxyPath,
 } from "../../utils/index";
 
-export type Signal<T = unknown> = {
+type SignalGetter<T = any> = (arg?: SubToken) => T;
+type SignalSetter<T> = (newValue: T) => void;
+
+export type SignalAPI<T = any> = [SignalGetter<T>, SignalSetter<T>];
+
+export type Signal<T = unknown> = SignalAPI & {
   id: string;
   (): T;
   /** Write value; notifying wires */
@@ -32,6 +37,8 @@ export type Signal<T = unknown> = {
   type: typeof Constants.SIGNAL;
 
   value: T;
+  get: SignalGetter<T>;
+  set: SignalSetter<T>;
 };
 
 export type ExtractElement<ArrayType extends ArrayOrObject> =
@@ -159,8 +166,9 @@ export const createWire: WireFactory = (arg) => {
   return w as Wire;
 };
 
+// todo: think about how to handle this with getter
 const runWire = (
-  arg: WireFunction | Signal | StoreCursor,
+  arg: WireFunction | Signal | StoreCursor | SignalGetter,
   token: SubToken,
   subWireFactory: WireFactory
 ) => {
@@ -247,25 +255,34 @@ const _runWires = (wires: Set<Wire<any>>): void => {
 };
 
 export const createSignal = <T = any>(val: T): Signal<T> => {
-  const s: Partial<Signal> = function (arg?: T) {
-    const sig = s as Signal;
-    if (arguments.length == 0) {
-      return s.value;
-    } else if (
-      arg &&
-      (arg as unknown as SubToken).type === Constants.SUBTOKEN
-    ) {
+  function get(arg?: SubToken) {
+    if (arg) {
+      const sig = s as Signal;
       const token = arg as unknown as SubToken;
       // Two-way link. Signal writes will now call/update wire W
       token.wire.sigRS.add(sig);
       sig.wires.add(token.wire);
-      return s.value;
+      return s.value as T;
     } else {
-      s.value = arg;
-      _runWires(sig.wires);
-      return val;
+      return s.value as T;
     }
-  };
+  }
+
+  function set(arg: T) {
+    const sig = s as Signal;
+    s.value = arg;
+    _runWires(sig.wires);
+    return val;
+  }
+
+  const s: any = [get, set];
+
+  // https://stackoverflow.com/a/78367121
+  // Define a tuple for iterable values
+  const iterablePayload = [get, set] as const;
+  s.get = get;
+  s.set = set as SignalSetter<T>;
+
   SIGNAL_COUNTER++;
   s.id = "signal|" + SIGNAL_COUNTER;
   s.value = val;
@@ -290,7 +307,7 @@ export const createStore = <T = unknown>(
   const observedObject = onChange(
     obj as Record<any, any>,
     (p, value, previousValue, change) => {
-      console.log(p, change, value);
+      //console.log(p, change, value);
       const changePath = p as string[];
       const toRun = new Set<Wire>();
       // todo: improve this logic
