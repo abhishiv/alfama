@@ -110,6 +110,7 @@ export const getVirtualElementId = (
 ): string | undefined => {
   const getElKey = (el: NativeVElement | ComponentVElement) =>
     el.p.key ? "/" + el.p.key : "";
+  // console.log("el", el);
   if (
     el === null ||
     el === undefined ||

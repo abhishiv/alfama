@@ -239,7 +239,7 @@ export const getUtils = (
       const s =
         match && match.signals && match.signals[name]
           ? (match.signals[name] as Signal<any>)
-          : (createSignal.anon(val) as Signal<any>);
+          : (createSignal(val) as Signal<any>);
       parentStep.state.signals[name] = s;
       return s;
     },
@@ -260,7 +260,7 @@ export const getUtils = (
       return s as StoreCursor<any>;
     },
     setContext(ctx, value?) {
-      parentStep.state.ctx.set(ctx, value || createSignal.anon(undefined));
+      parentStep.state.ctx.set(ctx, value || createSignal(undefined));
     },
     getContext: (token) => {
       //console.time("ctx");

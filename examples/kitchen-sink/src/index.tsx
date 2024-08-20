@@ -19,13 +19,13 @@ export const PortalExample = component("PortalExample", (props, utils) => {
     <div>
       <button
         onClick={(e) => {
-          $active(!$active());
+          $active.set(!$active.get());
         }}
       >
         toggle modal
       </button>
       <When
-        condition={($) => $active($)}
+        condition={($) => $active.get($)}
         views={{
           true: () => {
             return (
@@ -130,7 +130,7 @@ export const Layout = component<{}>(
   (props, { signal, wire, api }) => {
     //    return <Todos />;
     const $count = signal("count", 0);
-    const $doubleCount = wire(($) => $count($) * 2); // explicit subscription
+    const $doubleCount = wire(($) => $count.get($) * 2); // explicit subscription
 
     //    setTimeout(() => {
     //      //$count(6);
@@ -179,15 +179,15 @@ export const Layout = component<{}>(
           <p>
             <button
               onClick={() => {
-                $count($count() - 1);
+                $count.set($count.get() - 1);
               }}
             >
               -
             </button>
-            <span style="padding: 7px;">{wire($count)}</span>
+            <span style="padding: 7px;">{wire($count.get)}</span>
             <button
               onClick={() => {
-                $count($count() + 1);
+                $count.set($count.get() + 1);
               }}
             >
               +
@@ -196,7 +196,7 @@ export const Layout = component<{}>(
           <p>
             <strong>Greater than 5:?</strong>
             <When
-              condition={($) => $count($) > 5}
+              condition={($) => $count.get($) > 5}
               views={{
                 true: () => {
                   return <div key="true">"TRUE"</div>;
