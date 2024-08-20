@@ -9,7 +9,6 @@ import {
   getValueUsingPath,
 } from "../../utils/index";
 import * as Constants from "../constants";
-import { sign } from "crypto";
 
 export type { ObjPathProxy } from "../../utils/index";
 export {
