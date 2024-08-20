@@ -51,12 +51,11 @@ export const createWire: WireFactory = (
     },
     token: undefined as any,
   };
-  wire.token = getSubtoken(() => wire);
+  wire.token = getSubtoken(wire);
   return wire;
 };
 
-const getSubtoken = (fn: () => Wire): SubToken => {
-  const wire = fn();
+const getSubtoken = (wire: Wire): SubToken => {
   const token: SubToken = (arg: Signal | StoreCursor | SignalGetter) => {
     if (isSignal(arg)) {
       const v = arg.get(token);

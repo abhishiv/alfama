@@ -15,15 +15,14 @@ export type { ObjPathProxy } from "../../utils/index";
 export {
   getCursorProxyMeta as getProxyMeta,
   getCursor as getProxyPath,
-  type SignalGetter,
 } from "../../utils/index";
 
-type SignalGetter<T = any> = {
+export type SignalGetter<T = any> = {
   (arg?: SubToken): T;
   type: typeof Constants.SIGNAL_GETTER;
   sig: Signal<T>;
 };
-type SignalSetter<T> = (newValue: T) => void;
+export type SignalSetter<T> = (newValue: T) => void;
 
 export type SignalAPI<T = any> = [SignalGetter<T>, SignalSetter<T>];
 
