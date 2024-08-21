@@ -23,6 +23,7 @@ export const createSignal = <T = any>(val: T): Signal<T> => {
   }
 
   function set(value: T) {
+    if (sig.value === value) return value;
     sig.value = value;
     runWires(sig.wires);
     return val;
@@ -44,7 +45,7 @@ export const createComputedSignal = <T = any>(wire: Wire<T>) => {
   const value = wire.run();
   const signal = createSignal<T>(value);
   const handler = () => {
-    signal.set(wire.value as T);
+    if (signal.get() !== wire.value) signal.set(wire.value as T);
   };
   wire.tasks.add(handler);
   return signal;
