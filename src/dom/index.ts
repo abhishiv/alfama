@@ -95,6 +95,7 @@ export declare namespace h {
     export interface IntrinsicAttributes {
       children?: VElement[] | VElement;
       key?: string | number;
+      ref?: (el: any) => void;
     }
 
     // Allow children on all DOM elements (not components, see above)
