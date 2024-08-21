@@ -60,7 +60,7 @@ export type StoreManager<T = unknown> = {
     path: string[];
     observor: (change: StoreChange) => void;
   }>;
-  get: (cursor: StoreCursor, wire: Wire) => any;
+  get: (cursor: StoreCursor, token: SubToken) => any;
   unsubscribe: Function;
 };
 

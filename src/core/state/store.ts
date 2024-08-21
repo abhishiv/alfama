@@ -1,14 +1,7 @@
 import onChange, { ApplyData } from "on-change";
-import {
-  CursorProxy,
-  getCursor,
-  getCursorProxyMeta,
-  getValueUsingPath,
-  ObjPathProxy,
-  wrapWithCursorProxy,
-} from "../../utils/index";
+import { getCursor, getValueUsingPath } from "../../utils/index";
 import * as Constants from "../constants";
-import { StoreChange, StoreCursor, StoreManager, Wire } from "./types";
+import { StoreCursor, StoreManager, SubToken, Wire } from "./types";
 import { runWires } from "./wire";
 export {
   getCursorProxyMeta as getProxyMeta,
@@ -16,62 +9,17 @@ export {
 } from "../../utils/index";
 export type { ObjPathProxy } from "../../utils/index";
 
-let STORE_COUNTER = 0;
+const encodeCursor = (cursor: string[]) =>
+  cursor.map(encodeURIComponent).join("/");
+const decodeCursor = (str: string) => str.split("/").map(decodeURIComponent);
 
-const handleStoreChange = (
-  manager: StoreManager,
-  p: (string | symbol)[],
-  value: any,
-  previousValue: any,
-  change: ApplyData
-) => {
-  const changePath = p as string[];
-  const toRun = new Set<Wire>();
-  // todo: improve this logic
-  for (const wire of manager.wires) {
-    const cursors = wire.storesRS.get(manager);
-    if (cursors) {
-      for (var cursorStr of cursors) {
-        let match: boolean | undefined;
-        const cursor = cursorStr === "" ? [] : decodeCursor(cursorStr);
-        if (change === undefined) {
-          match =
-            cursor.length <= changePath.length
-              ? encodeCursor(changePath.slice(0, cursor.length)) == cursorStr
-              : true;
-        } else if (
-          change &&
-          ["splice", "push", "pop"].indexOf(change.name) > -1
-        ) {
-          match = encodeCursor(changePath.slice(0, cursor.length)) == cursorStr;
-        }
-        if (match) toRun.add(wire);
-      }
-    }
-  }
-
-  runWires(toRun);
-
-  [...manager.tasks].forEach(({ path, observor }) => {
-    if (changePath.slice(0, path.length).join("/") === path.join("/")) {
-      observor({ data: change, path: changePath, value });
-    }
-  });
-};
-
-export const createStore = <T = unknown>(
-  obj: T
-): StoreCursor<T, StoreManager<T>> => {
-  const observedObject = onChange(
-    obj as Record<any, any>,
-    (p, v, pv, data) => handleStoreChange(manager, p, v, pv, data),
-    {
-      pathAsArray: true,
-    }
-  );
-  STORE_COUNTER++;
+// Create the store manager with essential functionalities
+export function createStoreManager<T>(
+  id: number,
+  observedObject: Record<any, any>
+): StoreManager<T> {
   const manager: StoreManager<T> = {
-    id: "store|" + STORE_COUNTER,
+    id: "store|" + id,
     value: observedObject,
     wires: new Set<Wire>(),
     type: Constants.STORE,
@@ -79,49 +27,107 @@ export const createStore = <T = unknown>(
     unsubscribe: () => {
       onChange.unsubscribe(observedObject);
     },
-    get: (cursor: StoreCursor, wire: Wire) => {
-      const cursorPath = getCursor(cursor);
-      const encodedCursor = encodeCursor(cursorPath);
-      manager.wires.add(wire);
-      if (wire.storesRS.has(manager)) {
-        wire.storesRS.get(manager)?.add(encodedCursor);
-      } else {
-        const set = new Set<string>();
-        set.add(encodedCursor);
-        wire.storesRS.set(manager, set);
-      }
-      const v = getValueUsingPath(manager.value as any, cursorPath);
-      return v;
-    },
+    get: (cursor: StoreCursor, token: SubToken) =>
+      createStoreSubscription(manager, cursor, token.wire),
   };
+  return manager;
+}
 
-  const s = wrapWithCursorProxy<T, StoreManager<T>>(observedObject, manager);
-
-  return s as StoreCursor<T>;
-};
-
-export const reify = <T = unknown>(cursor: T): T => {
-  const s = cursor as unknown as StoreCursor;
-  const manager: StoreManager = getCursorProxyMeta<StoreManager>(
-    s as unknown as ObjPathProxy<unknown, unknown>
-  );
-  const cursorPath = getCursor(s);
+// Get the value from the store based on a cursor path
+function createStoreSubscription<T>(
+  manager: StoreManager,
+  cursor: StoreCursor,
+  wire: Wire
+): any {
+  const cursorPath = getCursor(cursor);
+  const encodedCursor = encodeCursor(cursorPath);
+  manager.wires.add(wire);
+  if (wire.storesRS.has(manager)) {
+    wire.storesRS.get(manager)?.add(encodedCursor);
+  } else {
+    const set = new Set<string>();
+    set.add(encodedCursor);
+    wire.storesRS.set(manager, set);
+  }
   const v = getValueUsingPath(manager.value as any, cursorPath);
-  return v as T;
-};
+  return v;
+}
 
-export const produce = <T = unknown>(
-  cursor: T,
-  setter: (obj: T) => void
-): void => {
-  const v = reify(cursor);
-  setter(v);
-};
+// Handle changes in the store and trigger associated tasks and wires
+export function handleStoreChange(
+  manager: StoreManager,
+  path: (string | symbol)[],
+  newValue: any,
+  oldValue: any,
+  changeData: ApplyData
+) {
+  const changePath = path as string[];
+  const wiresToRun = findMatchingWires(manager, changePath, changeData);
 
-//
-const encodeCursor = (cursor: string[]) =>
-  cursor.map(encodeURIComponent).join("/");
-const decodeCursor = (str: string) => str.split("/").map(decodeURIComponent);
+  runWires(wiresToRun);
+
+  triggerStoreTasks(manager, changePath, newValue, changeData);
+}
+
+// Find wires that match the change path
+function findMatchingWires(
+  manager: StoreManager,
+  changePath: string[],
+  changeData: ApplyData
+): Set<Wire> {
+  const matchingWires = new Set<Wire>();
+
+  manager.wires.forEach((wire) => {
+    const cursors = wire.storesRS.get(manager);
+    if (!cursors) return;
+
+    for (const cursorStr of cursors) {
+      const cursor = cursorStr === "" ? [] : decodeCursor(cursorStr);
+      const isMatch = matchCursorToChange(cursor, changePath, changeData);
+
+      if (isMatch) {
+        matchingWires.add(wire);
+      }
+    }
+  });
+
+  return matchingWires;
+}
+
+// Determine if a cursor matches the change path
+function matchCursorToChange(
+  cursor: string[],
+  changePath: string[],
+  changeData: ApplyData
+): boolean {
+  if (changeData === undefined) {
+    return cursor.length <= changePath.length
+      ? encodeCursor(changePath.slice(0, cursor.length)) == cursor.join("/")
+      : true;
+  }
+
+  if (["splice", "push", "pop"].includes(changeData.name)) {
+    return encodeCursor(changePath.slice(0, cursor.length)) == cursor.join("/");
+  }
+
+  return false;
+}
+
+// Trigger tasks based on the change path
+function triggerStoreTasks(
+  manager: StoreManager,
+  changePath: string[],
+  newValue: any,
+  changeData: ApplyData
+) {
+  manager.tasks.forEach(({ path, observor }) => {
+    const isPathMatching =
+      changePath.slice(0, path.length).join("/") === path.join("/");
+    if (isPathMatching) {
+      observor({ data: changeData, path: changePath, value: newValue });
+    }
+  });
+}
 
 //
 // Function to adjust cursor paths for array changes
@@ -154,28 +160,3 @@ function adjustCursorForArrayChange(cursor: string[], change: any): string[] {
 
   return newCursor;
 }
-
-export const applyStoreChange = (store: CursorProxy, change: StoreChange) => {
-  if (change.data) {
-    produce(getValueUsingPath(store, change.path), (state) => {
-      (state as any)[change.data.name].apply(state, change.data.args);
-    });
-  } else {
-    if (change.path.length === 0) {
-      produce(store, (s) => {
-        const v = change.value || {};
-        Object.keys(v).forEach((k) => {
-          (s as any)[k] = v[k];
-        });
-      });
-    } else {
-      const tail = change.path[change.path.length - 1];
-      produce(
-        getValueUsingPath(store, change.path.slice(0, change.path.length - 1)),
-        (state) => {
-          state[tail] = change.value;
-        }
-      );
-    }
-  }
-};
