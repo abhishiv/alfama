@@ -1,3 +1,6 @@
+export * from "./crawl";
+export * from "./cursor";
+
 export const getValueUsingPath = (
   record: Record<string, any>,
   path: string[]
@@ -7,6 +10,3 @@ export const getValueUsingPath = (
     ? record
     : path.reduce((record, item) => record[item], record);
 };
-
-export * from "./crawl";
-export * from "./cursor";

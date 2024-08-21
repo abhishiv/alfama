@@ -1,20 +1,11 @@
-import onChange, { ApplyData } from "on-change";
-import {
-  wrapWithCursorProxy,
-  CursorProxy,
-  isCursorProxy,
-  getCursor,
-  getCursorProxyMeta,
-  ObjPathProxy,
-  getValueUsingPath,
-} from "../../utils/index";
+import { ApplyData } from "on-change";
 import * as Constants from "../constants";
-
-export type { ObjPathProxy } from "../../utils/index";
+import { ObjPathProxy } from "../../utils/index";
 export {
   getCursorProxyMeta as getProxyMeta,
   getCursor as getProxyPath,
 } from "../../utils/index";
+export type { ObjPathProxy } from "../../utils/index";
 
 export type SignalGetter<T = any> = {
   (arg?: SubToken): T;
@@ -113,9 +104,7 @@ export type Wire<T = unknown> = {
   subWire: WireFactory;
 };
 
-export type WireFactory<T = any> = (
-  arg: WireFunction<T> | Signal<T> | StoreCursor
-) => Wire<T>;
+export type WireFactory<T = any> = (arg: WireFunction<T>) => Wire<T>;
 
 export type WireFunction<T = unknown> = {
   (

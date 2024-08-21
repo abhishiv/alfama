@@ -23,9 +23,7 @@ const S_RUNNING = 0b100 as const;
 const S_SKIP_RUN_QUEUE = 0b010 as const;
 const S_NEEDS_RUN = 0b001;
 
-export const createWire: WireFactory = (
-  arg: WireFunction | StoreCursor
-): Wire => {
+export const createWire: WireFactory = (arg: WireFunction): Wire => {
   WIRE_COUNTER++;
   const wire: Wire = {
     id: "wire|" + WIRE_COUNTER,
@@ -43,7 +41,7 @@ export const createWire: WireFactory = (
       // Clean up unused nested wires
       return val;
     },
-    subWire: (subFn: WireFunction | StoreCursor) => {
+    subWire: (subFn: WireFunction) => {
       const subWire = createWire(subFn);
       subWire.upper = wire;
       wire.lower.add(subWire);
