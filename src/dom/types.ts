@@ -14,6 +14,7 @@ export interface ComponentUtils {
   signal<T = unknown>(name: string, value: T): Signal<T>;
   store<T = unknown>(name: string, value: T): StoreCursor<T>;
   wire<V = unknown>(arg: WireFunction<V>): Wire<V>;
+  computedSignal<T = unknown>(name: string, wire: Wire<T>): Signal<T>;
   // todo: fix this typescript definition
   setContext<T = unknown>(ctx: T, value: ExtractGenericFromContext<T>): void;
   getContext<T extends Context>(ctx: T): ExtractGenericFromContext<T>;

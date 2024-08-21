@@ -21,11 +21,11 @@ let WIRE_COUNTER = 0;
 
 const S_RUNNING = 0b100 as const;
 const S_SKIP_RUN_QUEUE = 0b010 as const;
-const S_NEEDS_RUN = 0b001;
+const S_NEEDS_RUN = 0b001 as const;
 
 export const createWire: WireFactory = (arg: WireFunction): Wire => {
   WIRE_COUNTER++;
-  const wire: Wire = {
+  const wire: Wire = Object.assign(() => {}, {
     id: "wire|" + WIRE_COUNTER,
     type: Constants.WIRE,
     fn: arg,
@@ -48,7 +48,7 @@ export const createWire: WireFactory = (arg: WireFunction): Wire => {
       return subWire;
     },
     token: undefined as any,
-  };
+  } as Wire);
   wire.token = getSubtoken(wire);
   return wire;
 };
@@ -67,7 +67,7 @@ const getSubtoken = (wire: Wire): SubToken => {
     } else if (isStoreCursor(arg)) {
       const cursor = arg;
       const manager = getCursorProxyMeta<StoreManager>(cursor);
-      const v = manager.get(cursor, wire);
+      const v = manager.get(cursor, token);
       wire.value = v;
       return v;
     }

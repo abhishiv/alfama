@@ -23,6 +23,7 @@ import {
   createStore,
   StoreCursor,
   getProxyMeta,
+  createComputedSignal,
 } from "../core/state";
 import { LiveDocumentFragment } from "./dom";
 import { getCursorProxyMeta } from "../utils";
@@ -240,6 +241,17 @@ export const getUtils = (
         match && match.signals && match.signals[name]
           ? (match.signals[name] as Signal<any>)
           : (createSignal(val) as Signal<any>);
+      parentStep.state.signals[name] = s;
+      return s;
+    },
+    computedSignal(name: string, wire) {
+      const match = getTreeStepRenderContextState(renderContext, parentStep);
+
+      // this enables state preservation during HMR
+      const s =
+        match && match.signals && match.signals[name]
+          ? (match.signals[name] as Signal<any>)
+          : (createComputedSignal(wire) as Signal<any>);
       parentStep.state.signals[name] = s;
       return s;
     },
