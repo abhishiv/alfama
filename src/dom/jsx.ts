@@ -163,7 +163,7 @@ export declare type SVGElements = {
   use: SVGUseElement;
 };
 
-type TargetedEvent<
+export type TargetedEvent<
   Target extends EventTarget = EventTarget,
   TypedEvent extends Event = Event
 > = Omit<TypedEvent, "currentTarget"> & { readonly currentTarget: Target };

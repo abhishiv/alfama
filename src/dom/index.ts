@@ -15,6 +15,7 @@ import type {
   SVGAttrs,
   HTMLElements,
   SVGElements,
+  TargetedEvent,
 } from "./jsx";
 import { Wire } from "../core/state";
 
@@ -64,7 +65,7 @@ export { h };
 
 export function render(element: VElement, container: HTMLElement) {
   const renderContext = getRenderContext(container, element);
-  //console.log("root", root, registry);
+  console.log("root", renderContext);
   renderTreeStep(renderContext, element);
   return renderContext;
 }

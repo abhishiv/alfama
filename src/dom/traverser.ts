@@ -56,17 +56,7 @@ export const reifyTree = (
           (
             (step as ComponentTreeStep).mount || (dom as unknown as Element)
           ).append(...kids);
-          if (step.type == DOMConstants.ComponentTreeStep) {
-            if (step.onMount) {
-              step.onMount.forEach((el) => {
-                try {
-                  el();
-                } catch (e) {
-                  throw e;
-                }
-              });
-            }
-          }
+          //console.log("k", kids);
         }
       }
     },

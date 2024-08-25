@@ -5,6 +5,7 @@
   "type": "module",
   "main": "src/main.tsx",
   "scripts": {
+    "typecheck": "pwd",
     "dev": "vite",
     "test": "npx vitest --run --passWithNoTests",
     "build": "vite build",

@@ -10,6 +10,10 @@
     "./state": {
       "types": "./dist/core/index.d.ts",
       "import": "./dist/core/index.js"
+    },
+    "./animation": {
+      "types": "./dist/addons/animation/index.d.ts",
+      "import": "./dist/addons/animation/index.js"
     }
   }
 }

@@ -86,43 +86,6 @@ export const updateElement = (
   // todo
 };
 
-export const addNode = (
-  renderCtx: RenderContext,
-  parentStep: TreeStep,
-  node: TreeStep,
-  before?: TreeStep
-) => {
-  // console.log("addNode", parentStep, node, after);
-  const handle = (node: TreeStep) => {
-    node.parent = parentStep;
-    const nodes = getDescendants(node);
-    //console.log("n", nodes, nodes.length);
-    nodes.forEach((n) => renderCtx.reg.add(n));
-
-    // dom
-    const parentDOM = parentStep.dom;
-    if (!node.dom) return;
-    const elementsToInsert = node.dom;
-    if (before) {
-      const beforeIndex = parentStep.children.indexOf(before);
-      parentStep.children.splice(beforeIndex, 0, node);
-
-      const refNode: HTMLElement = before.dom as HTMLElement;
-      refNode.before(elementsToInsert);
-    } else {
-      parentStep.children.push(node);
-      if (parentDOM && (parentDOM as HTMLElement)) {
-        parentDOM.append(elementsToInsert);
-      }
-    }
-  };
-  if (Array.isArray(node)) {
-    node.forEach(handle);
-  } else {
-    handle(node);
-  }
-};
-
 export const getLiveFragmentChildNodes = (frag: LiveDocumentFragment) => {
   const els: Node[] = [];
   let node: Node | null = frag.startMarker;
@@ -134,6 +97,69 @@ export const getLiveFragmentChildNodes = (frag: LiveDocumentFragment) => {
     node = node.nextSibling;
   }
   return els;
+};
+
+export const addNode = (
+  renderCtx: RenderContext,
+  parentStep: TreeStep | undefined,
+  node: TreeStep,
+  before?: TreeStep
+) => {
+  //console.log("addNode", parentStep, node, before);
+  const handle = (node: TreeStep) => {
+    const nodes = getDescendants(node);
+    //console.log("n", nodes, nodes.length);
+    nodes.forEach((step) => {
+      renderCtx.reg.add(step);
+    });
+
+    if (!node.dom) return;
+    // dom
+    if (!parentStep) {
+      //      console.log("no parent", renderCtx.el, node.dom);
+      renderCtx.el.append(node.dom);
+    } else {
+      node.parent = parentStep;
+      if (parentStep && before) {
+        const elementsToInsert = node.dom;
+        const beforeIndex = parentStep.children.indexOf(before);
+        parentStep.children.splice(beforeIndex, 0, node);
+
+        const refNode: HTMLElement = before.dom as HTMLElement;
+        refNode.before(elementsToInsert);
+      } else if (parentStep) {
+        const parentDOM = parentStep.dom;
+        const elementsToInsert = node.dom;
+        parentStep.children.push(node);
+        if (parentDOM && (parentDOM as HTMLElement)) {
+          parentDOM.append(elementsToInsert);
+        }
+      }
+    }
+    nodes.forEach((step) => {
+      // call onMount
+      if (
+        step.type === DOMConstants.ComponentTreeStep &&
+        step.onMount.length > 0
+      ) {
+        step.onMount.forEach((el) => el());
+      }
+      // call ref
+      if (
+        step.type === DOMConstants.ComponentTreeStep ||
+        step.type === DOMConstants.NativeTreeStep
+      ) {
+        if (step.node.p && step.node.p.ref && step.dom) {
+          step.node.p.ref(step.dom);
+        }
+      }
+    });
+  };
+  if (Array.isArray(node)) {
+    node.forEach(handle);
+  } else {
+    handle(node);
+  }
 };
 
 export const rmNodes = (node: Node | LiveDocumentFragment) => {
@@ -169,16 +195,13 @@ export const removeNode = (renderCtx: RenderContext, node: TreeStep) => {
 };
 
 export const renderTreeStep = (renderCtx: RenderContext, element: VElement) => {
-  const { root, registry } = reifyTree(renderCtx, element);
-  const id = getVirtualElementId(root.node);
-  if (!id) throw createError(101);
-
   // todo: move this to getRenderContext so it clears DOM properly
   renderCtx.el.innerHTML = "";
 
-  registry.forEach((n) => renderCtx.reg.add(n));
-
-  root.dom && renderCtx.el.append(root.dom);
+  const { root, registry } = reifyTree(renderCtx, element);
+  const id = getVirtualElementId(root.node);
+  if (!id) throw createError(101);
+  addNode(renderCtx, undefined, root);
 };
 
 export const getRenderContext = (container: HTMLElement, element: VElement) => {

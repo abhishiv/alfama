@@ -1,4 +1,5 @@
 export * from "./dom";
+export type * from "./dom";
 export * from "./core/state";
 export * from "./stdlib/index";
 export * from "./utils/index";

@@ -86,7 +86,7 @@ export const createDOMNode = (
         if (key === "dangerouslySetInnerHTML") {
           el.innerHTML = value.__html;
         } else if (key == "ref" && typeof value === "function") {
-          (value as any)(el);
+          //(value as any)(el);
         } else if (isFunctionHandler) {
           // set function on el
           (el as any)[finalKey] = value;
