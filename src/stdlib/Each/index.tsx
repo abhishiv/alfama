@@ -53,13 +53,45 @@ export const Each: <T extends ArrayOrObject>(
     ) as any[];
     const isArray = Array.isArray(value);
 
-    const observor = function ({ data, path }: StoreChange) {
-      //    console.log("list change", data, path, value);
+    const observor = function (change: StoreChange) {
+      const { data, path, value } = change;
+      console.log("list change", change, eachCursorPath, path);
+      const pStep = parentStep.children[0];
+      const previousChildren = [...(pStep.children || [])];
+      previousChildren.forEach((node) => {
+        removeNode(renderContext, node);
+      });
+      if (eachCursorPath.join() === path.join()) {
+        console.log("should reset list");
+        if (Array.isArray(value)) {
+          const startIndex = 0;
+          value.forEach((item, index) => {
+            const previousChildren = [...(pStep.children || [])];
+            const { treeStep, el } = renderArray(
+              pStep,
+              props.renderItem,
+              cursor,
+              value,
+              index
+            );
+            const { registry, root } = reifyTree(renderContext, el, pStep);
+            const before = previousChildren[startIndex + index] || null;
+            addNode(renderContext, pStep, root, before);
+          });
+        } else {
+          Object.keys(value).forEach((key) => {
+            const el = props.renderItem((cursor as any)[key], key);
+            const treeStep = getTreeStep(parentStep, undefined, el);
+
+            const { registry, root } = reifyTree(renderContext, el, pStep);
+            addNode(renderContext, pStep, root);
+          });
+        }
+        return;
+      }
       //      console.log(path.slice(0, eachCursorPath.length).join("/"));
       // important
       // filter changes so you don't try to render invalid changes
-      const pStep = parentStep.children[0];
-      const previousChildren = [...(pStep.children || [])];
       if (isArray) {
         if (path.slice(0, eachCursorPath.length).join("/") !== path.join("/"))
           return;

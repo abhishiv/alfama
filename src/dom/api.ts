@@ -138,12 +138,6 @@ export const addNode = (
     }
     nodes.forEach((step) => {
       // call onMount
-      if (
-        step.type === DOMConstants.ComponentTreeStep &&
-        step.onMount.length > 0
-      ) {
-        step.onMount.forEach((el) => el());
-      }
       // call ref
       if (
         step.type === DOMConstants.ComponentTreeStep ||
@@ -152,6 +146,12 @@ export const addNode = (
         if (step.node.p && step.node.p.ref && step.dom) {
           step.node.p.ref(step.dom);
         }
+      }
+      if (
+        step.type === DOMConstants.ComponentTreeStep &&
+        step.onMount.length > 0
+      ) {
+        step.onMount.forEach((el) => el());
       }
     });
   };
