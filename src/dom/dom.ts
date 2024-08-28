@@ -3,7 +3,7 @@ import { TreeStep } from "./types";
 import { Wire } from "../core/state";
 import * as DOMConstants from "./constants";
 const createTextNode = (arg: string | number | boolean | null | undefined) =>
-  arg ? document.createTextNode(arg + "") : undefined;
+  document.createTextNode(arg == null || arg === undefined ? "" : arg + "");
 
 const createMarker = (text: string, owner: DocumentFragment) => {
   const marker = document.createComment(text);

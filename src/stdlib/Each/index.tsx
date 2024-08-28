@@ -55,14 +55,14 @@ export const Each: <T extends ArrayOrObject>(
 
     const observor = function (change: StoreChange) {
       const { data, path, value } = change;
-      console.log("list change", change, eachCursorPath, path);
+      //console.log("list change", change, eachCursorPath, path);
       const pStep = parentStep.children[0];
       const previousChildren = [...(pStep.children || [])];
-      previousChildren.forEach((node) => {
-        removeNode(renderContext, node);
-      });
       if (eachCursorPath.join() === path.join()) {
-        console.log("should reset list");
+        previousChildren.forEach((node) => {
+          removeNode(renderContext, node);
+        });
+        //console.log("should reset list");
         if (Array.isArray(value)) {
           const startIndex = 0;
           value.forEach((item, index) => {
