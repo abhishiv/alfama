@@ -65,7 +65,7 @@ export { h };
 
 export function render(element: VElement, container: HTMLElement) {
   const renderContext = getRenderContext(container, element);
-  console.log("root", renderContext);
+  //console.log("root", renderContext);
   renderTreeStep(renderContext, element);
   return renderContext;
 }
