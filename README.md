@@ -23,6 +23,22 @@
 - **First class HMR:** Preserves Signals/Stores across HMR loads for a truly stable HMR experience.
 - **DevEx:** no compile step needed if you want: choose your view syntax: `h` for plain javascript or `<JSX/>` for babel/typescript.
 
+#### Sponsors
+
+<table>
+  <tr>
+    <td>
+      <img width="25px" height="25px"  src="https://www.grati.co/images/favicon.png" />
+    </td>
+    <td>
+      <a href="https://www.grati.co">grati.co</a>
+    </td>
+    <td>
+      Next-Generation IDE
+    </td>
+  </tr>
+</table>
+
 #### Ecosystem
 
 <table>
