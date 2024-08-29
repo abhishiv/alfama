@@ -23,7 +23,7 @@
 - **First class HMR:** Preserves Signals/Stores across HMR loads for a truly stable HMR experience.
 - **DevEx:** no compile step needed if you want: choose your view syntax: `h` for plain javascript or `<JSX/>` for babel/typescript.
 
-#### Sponsors
+#### Backers & Sponsors
 
 <table>
   <tr>
