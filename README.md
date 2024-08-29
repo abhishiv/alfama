@@ -364,6 +364,11 @@ const [count, setCount] = signal("count", 0);
 
 count(); // Passive read (read-pass)
 setCount(1); // Write
+
+// also possible to use get/set on signal instead of tuples
+const $count = signal("count", 0);
+$count.get();
+$count.set(5);
 ```
 
 The subscribers to signals are wires, which will be introduced later. They subscribe by read-subscribing the signal.
@@ -391,8 +396,9 @@ These are task runners who subscribe to signals/stores and react to writes. They
 
 ```tsx
 wire(($) => {
-  // Explicitly subscribe to count signal using the subtoken "$"
-  const countValue = $(count); // or count($)
+  // Explicitly subscribe to count getter using the subtoken "$"
+  const [count, setCount] = signal("count", 4);
+  const countValue = $(count);
 
   // also possible to subscribe to a stores using "$" subtoken
   const friendsCount = $($profile.friends);
