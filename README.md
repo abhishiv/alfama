@@ -396,8 +396,7 @@ These are task runners who subscribe to signals/stores and react to writes. They
 
 ```tsx
 wire(($) => {
-  // Explicitly subscribe to count getter using the subtoken "$"
-  const [count, setCount] = signal("count", 4);
+  // Explicitly subscribe to count signal getter using the subtoken "$"
   const countValue = $(count);
 
   // also possible to subscribe to a stores using "$" subtoken
