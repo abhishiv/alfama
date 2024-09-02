@@ -227,6 +227,11 @@ export const getRenderContext = (container: HTMLElement, element: VElement) => {
       step.onUnmount.length > 0
     )
       step.onUnmount.forEach((el) => el());
+    if (step.type === DOMConstants.ComponentTreeStep) {
+      if (step.mount && step.dom instanceof HTMLElement) {
+        step.dom.remove();
+      }
+    }
 
     if (step.type === DOMConstants.ComponentTreeStep) {
       const ids: string[] = [];

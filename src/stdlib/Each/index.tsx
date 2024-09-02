@@ -51,6 +51,7 @@ export const Each: <T extends ArrayOrObject>(
       store.value as any,
       eachCursorPath
     ) as any[];
+    //console.log("value", value);
     const isArray = Array.isArray(value);
 
     const observor = function (change: StoreChange) {

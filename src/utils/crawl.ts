@@ -47,14 +47,14 @@ export const dfsPostOrder = <T>(
 // Helper function for dfsPreOrder.
 export const dfsPreOrder = <T>(
   root: T,
-  iterate: (node: T) => void | any,
+  iterate: (attrs: { node: T; i: number }) => void | any,
   kids: (node: T) => T[]
 ) => {
   // The stack holds the nodes we need to visit.
-  const stack: T[] = [];
+  const stack: { node: T; i: number }[] = [];
 
   // Push the root node onto the stack to start the traversal.
-  stack.push(root);
+  stack.push({ node: root, i: 0 });
 
   while (stack.length > 0) {
     const node = stack.pop();
@@ -66,11 +66,11 @@ export const dfsPreOrder = <T>(
 
     // Push all the children onto the stack in reverse order so that
     // they are processed in the original order.
-    const k = kids(node);
+    const k = kids(node.node);
     //      console.log("k", k);
     const children = [...(k || [])].reverse();
-    children.forEach((child) => {
-      stack.push(child);
+    children.forEach((child, i) => {
+      stack.push({ node: child, i });
     });
   }
 };

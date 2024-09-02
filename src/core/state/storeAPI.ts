@@ -25,6 +25,7 @@ export const createStore = <T = unknown>(
     (p, v, pv, data) => handleStoreChange(manager, p, v, pv, data),
     {
       pathAsArray: true,
+      ignoreDetached: true,
     }
   );
   STORE_COUNTER++;
