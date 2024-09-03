@@ -48,9 +48,10 @@ export const reify = <T = unknown>(cursor: T): T => {
 
 export const produce = <T = unknown>(
   cursor: T,
-  setter: (obj: T) => void
+  setter: (obj: T) => void,
+  fv?: any
 ): void => {
-  const v = reify(cursor);
+  const v = fv ? fv : reify(cursor);
   setter(v);
 };
 

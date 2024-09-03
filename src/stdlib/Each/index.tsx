@@ -60,6 +60,10 @@ export const Each: <T extends ArrayOrObject>(
     if (!isArray) throw new Error("<Each/> needs array");
 
     const getItemCursor = (item: ExtractElement<typeof listCursor>) => {
+      const listValue: typeof listCursor = getValueUsingPath(
+        store.value as any,
+        listCursorPath
+      ) as typeof listCursor;
       const index = listValue.indexOf(item);
       if (index > -1) {
         return props.cursor[index];
@@ -73,12 +77,11 @@ export const Each: <T extends ArrayOrObject>(
       //console.log("Each list change", change, listCursorPath, path);
       const pStep = parentStep.children[0];
       const previousChildren = [...(pStep.children || [])];
+      // list reset
       if (listCursorPath.join() === path.join() && !data) {
         previousChildren.forEach((node) => {
           removeNode(renderContext, node);
         });
-        //console.log("should reset list");
-
         const startIndex = 0;
         (value as typeof props.cursor).forEach((item, index) => {
           const previousChildren = [...(pStep.children || [])];

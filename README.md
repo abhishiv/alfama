@@ -139,8 +139,8 @@ export const Todos = component("Todos", (props, { signal, wire, store }) => {
     <ul>
       <Each
         cursor={$todos.items}
-        renderItem={(item) => {
-          return <li>{item.task}</li>;
+        renderItem={(cursor) => {
+          return <li>{cursor().task}</li>;
         }}
       ></Each>
     </ul>
@@ -241,8 +241,8 @@ export const Prosemirror = component("Prosemirror", (props, { onUnmount }) => {
 ```tsx
 <Each
   cursor={$todos.items}
-  renderItem={(item) => {
-    return <li>{wire(item.task)}</li>;
+  renderItem={(cursor) => {
+    return <li>{wire(cursor().task)}</li>;
   }}
 ></Each>
 ```
