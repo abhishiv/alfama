@@ -37,5 +37,9 @@ export const getCursor = (cursor: StoreCursor) => [
   ...(cursor as CursorProxyInternal)[PATH_FLAG],
 ];
 
+export const getReactiveCursor = (cursor: StoreCursor) => [
+  ...(cursor as CursorProxyInternal)[PATH_FLAG],
+];
+
 export const getCursorProxyMeta = <T = unknown>(cursor: CursorProxy) =>
   (cursor as CursorProxyInternal)[META_FLAG] as T;

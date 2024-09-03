@@ -35,7 +35,7 @@ export const insertElement = (
   el: VElement,
   after?: string
 ) => {
-  console.log("insert", parentPath, el, after);
+  //  console.log("insert", parentPath, el, after);
 
   const step = parentPath.reduce<TreeStep | undefined>((step, key) => {
     if (!step) return;
@@ -176,6 +176,22 @@ export const removeNode = (renderCtx: RenderContext, node: TreeStep) => {
   const nodes = getDescendants(node);
   //  console.log("removeNode nodes", node, nodes);
   nodes.forEach((step) => {
+    if (step.type === DOMConstants.ComponentTreeStep) {
+      //step.wires.length && console.log("s", step, step.wires.length);
+      step.wires.forEach((w) => {
+        w.storesRS.forEach((s, manager) => {
+          if (manager.wires.has(w)) {
+            //console.log("removing wire", s, manager);
+            manager.wires.delete(w);
+          }
+        });
+        w.sigRS.forEach((sig) => {
+          sig.wires.delete(w);
+        });
+        w.tasks.clear();
+      });
+      step.wires = [];
+    }
     if (step.dom) {
       if (
         step.type === DOMConstants.ComponentTreeStep &&

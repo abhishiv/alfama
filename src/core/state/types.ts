@@ -29,13 +29,9 @@ export type Signal<T = unknown> = SignalAPI & {
 };
 
 export type ExtractElement<ArrayType extends ArrayOrObject> =
-  ArrayType extends readonly (infer ElementType)[]
-    ? ElementType
-    : ArrayType extends { [key: string]: infer ElementType2 }
-    ? ElementType2
-    : never;
+  ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
 
-export type ArrayOrObject = Array<unknown> | Record<string, unknown>;
+export type ArrayOrObject = Array<unknown>;
 
 export type StoreCursor<T = unknown, TRoot = T> = T extends ArrayOrObject
   ? {
@@ -90,7 +86,7 @@ export type Wire<T = unknown> = {
 
   // Signals/Stores read-subscribed last run
   sigRS: Set<Signal>;
-  storesRS: WeakMap<StoreManager, Set<string>>;
+  storesRS: Map<StoreManager, Set<string>>;
 
   // Post-run tasks
   tasks: Set<(nextValue: T) => void>;

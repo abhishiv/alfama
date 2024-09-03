@@ -131,6 +131,7 @@ describe("Basic Implementation of Stores & Wires", (test) => {
     });
     expect(changes.length).toBe(2);
     changes.forEach((change) => {
+      console.log("1", change);
       applyStoreChange(store2, change);
     });
     const store2Value = reify(store2);

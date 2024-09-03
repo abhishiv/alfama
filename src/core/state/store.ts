@@ -49,8 +49,13 @@ function createStoreSubscription<T>(
     set.add(encodedCursor);
     wire.storesRS.set(manager, set);
   }
-  const v = getValueUsingPath(manager.value as any, cursorPath);
-  return v;
+  try {
+    const v = getValueUsingPath(manager.value as any, cursorPath);
+    return v;
+  } catch (e) {
+    console.log(wire, wire.storesRS, encodedCursor, manager.value);
+    throw e;
+  }
 }
 
 // Handle changes in the store and trigger associated tasks and wires
@@ -61,11 +66,11 @@ export function handleStoreChange(
   oldValue: any,
   changeData: ApplyData
 ) {
+  //  console.log("handleStoreChange", path, newValue, oldValue, changeData);
   const changePath = path as string[];
+  adjustCursorForArrayChange(manager, path as string[], changeData);
   const wiresToRun = findMatchingWires(manager, changePath, changeData);
-
   runWires(wiresToRun);
-
   triggerStoreTasks(manager, changePath, newValue, changeData);
 }
 
@@ -124,39 +129,106 @@ function triggerStoreTasks(
     const isPathMatching =
       changePath.slice(0, path.length).join("/") === path.join("/");
     if (isPathMatching) {
-      observor({ data: changeData, path: changePath, value: newValue });
+      observor({
+        data: (changeData
+          ? {
+              name: changeData.name,
+              args: changeData.args,
+              result: undefined,
+            }
+          : undefined) as any,
+        path: changePath,
+        value: newValue,
+      });
     }
   });
 }
 
 //
 // Function to adjust cursor paths for array changes
-function adjustCursorForArrayChange(cursor: string[], change: any): string[] {
-  const newCursor = [...cursor];
-  const index = parseInt(change.path[change.path.length - 1], 10);
-
-  switch (change.type) {
-    case "insert":
-      if (index <= cursor.length) {
-        newCursor.push(String(index));
-      }
-      break;
-    case "delete":
-      if (index < cursor.length) {
-        newCursor.splice(index, 1);
-      }
-      break;
-    case "splice":
-      const { index: spliceIndex, removed, added } = change;
-      if (spliceIndex <= cursor.length) {
-        newCursor.splice(
-          spliceIndex,
-          removed.length,
-          ...added.map((_: any, i: any) => String(spliceIndex + i))
-        );
-      }
-      break;
+function adjustCursorForArrayChange(
+  manager: StoreManager,
+  changePath: string[],
+  change: ApplyData
+): void {
+  if (!change || change.name !== "splice") {
+    return;
   }
+  const args = change.args as [string, string];
+  const start = parseInt(args[0]);
+  const deleteCount = parseInt(args[1]);
 
-  return newCursor;
+  //  console.log("adjustCursorForArrayChange", { start, deleteCount });
+
+  manager.wires.forEach((wire) => {
+    wire.storesRS.forEach((cursorSet) => {
+      const { toRemove, toAdd } = adjustCursorsInSet(
+        cursorSet,
+        changePath,
+        start,
+        deleteCount
+      );
+
+      toRemove.forEach((cursor) => cursorSet.delete(cursor));
+      toAdd.forEach((cursor) => cursorSet.add(cursor));
+
+      //console.log({ toRemove, toAdd }, wire.storesRS);
+    });
+  });
+
+  manager.tasks.forEach((task) => {
+    if (isPathAffected(task.path, changePath)) {
+      const listenerIndex = getListenerIndex(task.path, changePath.length);
+
+      if (start + deleteCount <= listenerIndex) {
+        const newIndex = listenerIndex - deleteCount;
+        task.path[changePath.length] = newIndex.toString();
+        //console.log("Updated task path", encodeCursor(task.path));
+      }
+    }
+  });
+}
+
+function adjustCursorsInSet(
+  cursorSet: Set<string>,
+  changePath: string[],
+  start: number,
+  deleteCount: number
+): { toRemove: string[]; toAdd: string[] } {
+  const toRemove: string[] = [];
+  const toAdd: string[] = [];
+
+  cursorSet.forEach((cursorString) => {
+    const cursor = decodeCursor(cursorString);
+    if (isPathMatching(cursor, changePath)) {
+      const listenerIndex = getListenerIndex(cursor, changePath.length);
+
+      if (start + deleteCount <= listenerIndex) {
+        toRemove.push(cursorString);
+        cursor[changePath.length] = (listenerIndex - deleteCount).toString();
+        toAdd.push(encodeCursor(cursor));
+      }
+    }
+  });
+
+  return { toRemove, toAdd };
+}
+
+function isPathMatching(cursor: string[], changePath: string[]): boolean {
+  return (
+    encodeCursor(changePath) ===
+    encodeCursor(cursor.slice(0, changePath.length))
+  );
+}
+
+function getListenerIndex(cursor: string[], pathLength: number): number {
+  return parseInt(cursor[pathLength]);
+}
+
+function isPathAffected(path: string[], changePath: string[]): boolean {
+  return (
+    encodeCursor(changePath) ===
+      encodeCursor(path.slice(0, changePath.length)) &&
+    path.length > changePath.length
+  );
 }

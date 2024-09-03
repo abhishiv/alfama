@@ -30,7 +30,7 @@ export const createWire: WireFactory = (arg: WireFunction): Wire => {
     type: Constants.WIRE,
     fn: arg,
     sigRS: new Set(),
-    storesRS: new WeakMap(),
+    storesRS: new Map(),
     tasks: new Set(),
     state: S_NEEDS_RUN,
     upper: undefined,
@@ -120,7 +120,7 @@ const _initWire = (wire: Wire<any>): void => {
   wire.lower = new Set();
   // Drop all signals now that they have been unlinked
   wire.sigRS = new Set();
-  wire.storesRS = new WeakMap();
+  wire.storesRS = new Map();
 };
 
 // Pauses a wire so signal writes won't cause runs. Affects nested wires
