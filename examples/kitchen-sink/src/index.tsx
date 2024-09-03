@@ -100,22 +100,22 @@ export const Todos = component("Todos", (props, { signal, wire, store }) => {
         <Each
           cursor={$todos.items}
           renderItem={(cursor, i) => {
-            const v = reify(cursor);
+            const v = reify(cursor());
             return (
               <li key={i + ""}>
                 <span style="padding: 0 4px 0 0 ;">
                   <button
                     onClick={(e) => {
-                      const b = cursor.stats;
+                      const b = cursor().stats;
                       produce(b, (obj) => {
                         obj.count = obj.count + 1;
                       });
                     }}
                   >
-                    {wire(($: SubToken) => $(cursor.stats.count))}
+                    {wire(($: SubToken) => $(cursor().stats.count))}
                   </button>
                 </span>
-                {wire(($: SubToken) => $(cursor.task))}
+                {wire(($: SubToken) => $(cursor().task))}
               </li>
             );
           }}
