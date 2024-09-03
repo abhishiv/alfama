@@ -154,9 +154,10 @@ function adjustCursorForArrayChange(
   if (!change || change.name !== "splice") {
     return;
   }
-  const args = change.args as [string, string];
+  const args = change.args as [string, string, ...any];
   const start = parseInt(args[0]);
   const deleteCount = parseInt(args[1]);
+  const items = args.slice(2);
 
   //  console.log("adjustCursorForArrayChange", { start, deleteCount });
 
