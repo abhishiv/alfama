@@ -23,6 +23,9 @@ export const Portal = component<PortalProps>(
       renderContext,
     }
   ) => {
+    onUnmount((step: any) => {
+      if (step && step.dom && step.dom.remove) step.dom.remove();
+    });
     (parentStep as ComponentTreeStep).mount = props.mount;
     return props.children;
   }

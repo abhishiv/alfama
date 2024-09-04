@@ -33,7 +33,13 @@ export type ExtractElement<ArrayType extends ArrayOrObject> =
 
 export type ArrayOrObject = Array<unknown>;
 
-export type StoreCursor<T = unknown, TRoot = T> = T extends ArrayOrObject
+export type ArrayOrObjectAndNotFunction = ArrayOrObject &
+  ({ bind?: never } | { call?: never });
+
+export type StoreCursor<
+  T = unknown,
+  TRoot = T
+> = T extends ArrayOrObjectAndNotFunction
   ? {
       [P in keyof T]: T[P];
     }

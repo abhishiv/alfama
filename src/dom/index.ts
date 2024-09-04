@@ -63,8 +63,12 @@ function h(
 }
 export { h };
 
-export function render(element: VElement, container: HTMLElement) {
-  const renderContext = getRenderContext(container, element);
+export function render(
+  element: VElement,
+  container: HTMLElement,
+  options = {}
+) {
+  const renderContext = getRenderContext(container, element, (options = {}));
   //console.log("root", renderContext);
   renderTreeStep(renderContext, element);
   return renderContext;

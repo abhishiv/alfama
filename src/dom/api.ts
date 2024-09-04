@@ -220,7 +220,11 @@ export const renderTreeStep = (renderCtx: RenderContext, element: VElement) => {
   addNode(renderCtx, undefined, root);
 };
 
-export const getRenderContext = (container: HTMLElement, element: VElement) => {
+export const getRenderContext = (
+  container: HTMLElement,
+  element: VElement,
+  options = {}
+) => {
   const id = getVirtualElementId(element);
   if (!id) throw createError(101);
 
@@ -242,9 +246,9 @@ export const getRenderContext = (container: HTMLElement, element: VElement) => {
       step.type === DOMConstants.ComponentTreeStep &&
       step.onUnmount.length > 0
     )
-      step.onUnmount.forEach((el) => el());
+      step.onUnmount.forEach((el) => el(step));
     if (step.type === DOMConstants.ComponentTreeStep) {
-      if (step.mount && step.dom instanceof HTMLElement) {
+      if (step.mount && step.dom instanceof Element) {
         step.dom.remove();
       }
     }

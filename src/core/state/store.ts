@@ -167,7 +167,8 @@ function adjustCursorForArrayChange(
         cursorSet,
         changePath,
         start,
-        deleteCount
+        deleteCount,
+        items
       );
 
       toRemove.forEach((cursor) => cursorSet.delete(cursor));
@@ -182,7 +183,7 @@ function adjustCursorForArrayChange(
       const listenerIndex = getListenerIndex(task.path, changePath.length);
 
       if (start + deleteCount <= listenerIndex) {
-        const newIndex = listenerIndex - deleteCount;
+        const newIndex = listenerIndex - deleteCount + items.length;
         task.path[changePath.length] = newIndex.toString();
         //console.log("Updated task path", encodeCursor(task.path));
       }
@@ -194,7 +195,8 @@ function adjustCursorsInSet(
   cursorSet: Set<string>,
   changePath: string[],
   start: number,
-  deleteCount: number
+  deleteCount: number,
+  items: any[]
 ): { toRemove: string[]; toAdd: string[] } {
   const toRemove: string[] = [];
   const toAdd: string[] = [];
@@ -206,7 +208,11 @@ function adjustCursorsInSet(
 
       if (start + deleteCount <= listenerIndex) {
         toRemove.push(cursorString);
-        cursor[changePath.length] = (listenerIndex - deleteCount).toString();
+        cursor[changePath.length] = (
+          listenerIndex -
+          deleteCount +
+          items.length
+        ).toString();
         toAdd.push(encodeCursor(cursor));
       }
     }
