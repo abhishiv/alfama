@@ -27,6 +27,7 @@ export {
   insertElement,
   removeElement,
   updateElement,
+  unmount,
 } from "./api";
 export { reifyTree } from "./traverser";
 

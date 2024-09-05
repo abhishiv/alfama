@@ -171,40 +171,38 @@ export const rmNodes = (node: Node | LiveDocumentFragment) => {
   }
 };
 
+export const unmount = (step: TreeStep) => {
+  if (step.type === DOMConstants.ComponentTreeStep) {
+    step.wires.forEach((w) => {
+      w.storesRS.forEach((s, manager) => {
+        if (manager.wires.has(w)) {
+          manager.wires.delete(w);
+        }
+      });
+      w.sigRS.forEach((sig) => {
+        sig.wires.delete(w);
+      });
+      w.tasks.clear();
+    });
+    step.wires = [];
+    if (step.onUnmount.length > 0) step.onUnmount.forEach((el) => el(step));
+    if (step.mount) {
+      console.log("unount", step.mount, step.dom, step);
+      step.dom instanceof Node && rmNodes(step.dom);
+    }
+    for (var s in step.state.stores) {
+      // todo unsubscribe from store
+    }
+  }
+};
+
 export const removeNode = (renderCtx: RenderContext, node: TreeStep) => {
   //console.log("removeNodes", nodes);
   const nodes = getDescendants(node);
   //  console.log("removeNode nodes", node, nodes);
   nodes.forEach((step) => {
-    if (step.type === DOMConstants.ComponentTreeStep) {
-      //step.wires.length && console.log("s", step, step.wires.length);
-      step.wires.forEach((w) => {
-        w.storesRS.forEach((s, manager) => {
-          if (manager.wires.has(w)) {
-            //console.log("removing wire", s, manager);
-            manager.wires.delete(w);
-          }
-        });
-        w.sigRS.forEach((sig) => {
-          sig.wires.delete(w);
-        });
-        w.tasks.clear();
-      });
-      step.wires = [];
-    }
-    if (step.dom) {
-      if (
-        step.type === DOMConstants.ComponentTreeStep &&
-        step.onUnmount.length > 0
-      ) {
-        step.onUnmount.forEach((el) => el());
-        for (var s in step.state.stores) {
-          // todo unsubscribe from store
-        }
-      }
-      rmNodes(step.dom);
-      step.dom = undefined;
-    }
+    unmount(step);
+    if (step.dom && step.dom instanceof Element) step.dom.remove();
     renderCtx.reg.delete(step);
     step.parent ? arrayRemove(step.parent.children, step) : null;
   });
@@ -239,20 +237,9 @@ export const getRenderContext = (
     } as RenderContext);
 
   renderContext.prevState.clear();
-
+  // console.log("rendering", renderContext.reg);
   // so HMR is properly cleaned up
   renderContext.reg.forEach((step) => {
-    if (
-      step.type === DOMConstants.ComponentTreeStep &&
-      step.onUnmount.length > 0
-    )
-      step.onUnmount.forEach((el) => el(step));
-    if (step.type === DOMConstants.ComponentTreeStep) {
-      if (step.mount && step.dom instanceof Element) {
-        step.dom.remove();
-      }
-    }
-
     if (step.type === DOMConstants.ComponentTreeStep) {
       const ids: string[] = [];
       let ancestor: TreeStep | undefined = step;
@@ -265,6 +252,7 @@ export const getRenderContext = (
       }
       renderContext.prevState.set(ids, step.state);
     }
+    unmount(step);
   });
 
   renderContext.reg.clear();

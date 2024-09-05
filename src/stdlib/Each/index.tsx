@@ -13,9 +13,10 @@ import { ComponentUtils, VElement } from "../../dom/types";
 import { ParentWireContext } from "../../dom/index";
 import { META_FLAG, ObjPathProxy, getCursor } from "../../utils/index";
 import { TreeStep } from "../../dom/types";
-import { getUtils, addNode, removeNode } from "../../dom/api";
+import { getUtils, addNode, removeNode, unmount } from "../../dom/api";
 import { reifyTree, getTreeStep } from "../../dom/traverser";
 import { getValueUsingPath } from "../../utils/index";
+import { getDescendants } from "../../dom/utils";
 
 export const Each: <T extends ArrayOrObject>(
   props: {
@@ -57,7 +58,10 @@ export const Each: <T extends ArrayOrObject>(
     ) as typeof listCursor;
     //console.log("value", value);
     const isArray = Array.isArray(listValue);
-    if (!isArray) throw new Error("<Each/> needs array");
+    if (!isArray) {
+      console.error(listCursorPath);
+      throw new Error("<Each/> needs array");
+    }
 
     const getItemCursor = (item: ExtractElement<typeof listCursor>) => {
       const listValue: typeof listCursor = getValueUsingPath(
@@ -169,8 +173,12 @@ export const Each: <T extends ArrayOrObject>(
     onMount(() => {
       store.tasks.add(task);
     });
-    onUnmount(() => {
+    onUnmount((step: any) => {
       store.tasks.delete(task);
+      const nodes = getDescendants(step).filter((el) => el !== step);
+      nodes.forEach((el) => {
+        unmount(el);
+      });
     });
 
     return (
