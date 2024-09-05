@@ -28,6 +28,7 @@ export const Portal = component<PortalProps>(
     onUnmount((step: any) => {
       console.log("removeing Portal", step.dom);
       const nodes = getDescendants(step).filter((el) => el !== step);
+      console.log("n", nodes);
       nodes.forEach((el) => {
         unmount(el);
       });

@@ -112,6 +112,7 @@ export const runWire = (
 const wireReset = (wire: Wire<any>): void => {
   wire.lower.forEach(wireReset);
   wire.sigRS.forEach((signal) => signal.wires.delete(wire));
+  // todo: handle stores here as well
   _initWire(wire);
 };
 

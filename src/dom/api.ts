@@ -24,6 +24,7 @@ import {
   StoreCursor,
   getProxyMeta,
   createComputedSignal,
+  StoreManager,
 } from "../core/state";
 import { LiveDocumentFragment } from "./dom";
 import { getCursorProxyMeta } from "../utils";
@@ -183,6 +184,15 @@ export const unmount = (step: TreeStep) => {
         sig.wires.delete(w);
       });
       w.tasks.clear();
+      w.storesRS.clear();
+      w.sigRS.clear();
+    });
+    Object.values(step.state.signals).forEach((sig) => sig.wires.clear());
+    Object.values(step.state.stores).forEach((store) => {
+      const manager: StoreManager = getCursorProxyMeta(store);
+      manager.tasks.clear();
+      manager.wires.clear();
+      manager.unsubscribe();
     });
     step.wires = [];
     if (step.onUnmount.length > 0) step.onUnmount.forEach((el) => el(step));
@@ -293,7 +303,7 @@ export const getUtils = (
     },
     wire(arg) {
       const w = createWire(arg);
-      parentStep.wires?.push(w);
+      parentStep.wires.push(w);
       return w;
     },
     store(name: string, val) {
