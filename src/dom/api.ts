@@ -174,6 +174,7 @@ export const rmNodes = (node: Node | LiveDocumentFragment) => {
 
 export const unmount = (step: TreeStep) => {
   if (step.type === DOMConstants.ComponentTreeStep) {
+    if (step.onUnmount.length > 0) step.onUnmount.forEach((el) => el(step));
     step.wires.forEach((w) => {
       w.storesRS.forEach((s, manager) => {
         if (manager.wires.has(w)) {
@@ -195,11 +196,10 @@ export const unmount = (step: TreeStep) => {
       manager.unsubscribe();
     });
     step.wires = [];
-    if (step.onUnmount.length > 0) step.onUnmount.forEach((el) => el(step));
     if (step.mount) {
       console.log("unount", step.mount, step.dom, step);
-      step.dom instanceof Node && rmNodes(step.dom);
     }
+    step.dom instanceof Node && rmNodes(step.dom);
     for (var s in step.state.stores) {
       // todo unsubscribe from store
     }
