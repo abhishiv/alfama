@@ -28,7 +28,7 @@
 <table>
   <tr>
     <td>
-      <img width="25px" height="25px"  src="https://www.grati.co/images/favicon.png" />
+      <img width="25px" height="25px"  src="https://www.grati.co/images/logo5.png" />
     </td>
     <td>
       <a href="https://www.grati.co">grati.co</a>
