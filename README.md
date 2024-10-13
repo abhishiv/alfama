@@ -75,7 +75,7 @@ const Page = component("HomePage", (props, { signal, wire }) => {
     <div id="home">
       <p>Hey, {props.name}</p>
       <button onClick={() => setCount(count() + 1)}>
-        Increment / {wire(count.get)} // or wire(($) => $(count.get))
+        Increment / {wire(count)})
       </button>
       <p>Double count = {$doubleCount}</p>
     </div>
