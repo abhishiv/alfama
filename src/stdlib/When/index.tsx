@@ -7,9 +7,11 @@ import { ParentWireContext } from "../../dom/index";
 import { addNode, removeNode } from "../../dom/api";
 import { reifyTree } from "../../dom/traverser";
 
-export type WhenViews = { [key: string]: () => VElement };
+export type WhenViews =
+  | Record<string, () => VElement>
+  | ((value: any) => VElement);
 export type WhenProps = {
-  condition: ($: SubToken) => keyof WhenViews | boolean;
+  condition: ($: SubToken) => any;
   views: WhenViews;
   fallback?: () => VElement;
   options?: { cached?: boolean };
@@ -31,13 +33,16 @@ export const When = component<WhenProps>(
       renderContext,
     }
   ) => {
-    // todo: important memory leak
-    const rootWire = wire(($: SubToken) => {});
-    setContext(ParentWireContext, signal("$wire", rootWire));
     const underlying = utils.wire(props.condition);
     const value = underlying.run();
-    const getView = (value: any) =>
-      props.views[value as unknown as any] || props.fallback;
+    const getView = (value: any) => {
+      //console.log("p", value, props.views, typeof props.views);
+      if (typeof props.views === "function") {
+        return () => (props.views as Function)(value);
+      } else {
+        return props.views[value as unknown as any] || props.fallback;
+      }
+    };
     const task = (value: any) => {
       const view = getView(value);
       const u = view ? view() : null;

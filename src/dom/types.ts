@@ -1,7 +1,7 @@
 import { Signal, Wire, StoreCursor, WireFunction } from "../core/state";
 
 import * as DOMConstants from "./constants";
-export type DOMNode = HTMLElement | DocumentFragment;
+export type DOMNodeType = HTMLElement | DocumentFragment;
 
 export type PrimitiveType = string | number | boolean | null | undefined;
 
@@ -68,7 +68,7 @@ export type VElement<T = any> =
 
 // Tree steps
 export type BaseTreeStep = {
-  dom?: DOMNode;
+  dom?: DOMNodeType;
   id?: string;
   parent?: TreeStep;
   meta?: Record<string, any>;
@@ -89,14 +89,11 @@ export interface ComponentTreeStep extends BaseTreeStep {
   onUnmount: Function[];
   onMount: Function[];
 }
+
 export interface ComponentTreeStepState {
-  signals: {
-    [name: string]: Signal;
-  };
-  stores: {
-    [name: string]: StoreCursor;
-  };
-  ctx: WeakMap<any, any>;
+  signals: Record<string, Signal>;
+  stores: Record<string, StoreCursor>;
+  ctx: Map<any, any>;
 }
 
 export interface PrimitiveTreeStep extends BaseTreeStep {

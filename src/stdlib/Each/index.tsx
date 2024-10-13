@@ -60,14 +60,17 @@ export const Each: <T extends ArrayOrObject>(
     if (!isArray) throw new Error("<Each/> needs array");
 
     const getItemCursor = (item: ExtractElement<typeof listCursor>) => {
+      const store: StoreManager = (listCursor as any)[META_FLAG];
       const listValue: typeof listCursor = getValueUsingPath(
         store.value as any,
         listCursorPath
       ) as typeof listCursor;
+      //      console.log("listValue", listValue, item);
       const index = listValue.indexOf(item);
       if (index > -1) {
         return props.cursor[index];
       } else {
+        // debugger;
         console.error("accessing no existent item", index, item, listValue);
       }
     };
@@ -107,6 +110,7 @@ export const Each: <T extends ArrayOrObject>(
       if (path.slice(0, listCursorPath.length).join("/") !== path.join("/"))
         return;
       if (data?.name === "push") {
+        //        console.log("data", data);
         data.args.forEach((arg, i) => {
           const index = previousChildren.length + i;
           const { treeStep, el } = renderArray(
@@ -118,6 +122,7 @@ export const Each: <T extends ArrayOrObject>(
             utils,
             getItemCursor
           );
+          // console.log({ treeStep, el, index, previousChildren });
           const { registry, root } = reifyTree(renderContext, el, pStep);
           addNode(renderContext, pStep, root);
         });

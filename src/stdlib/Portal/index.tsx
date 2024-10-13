@@ -1,10 +1,11 @@
 /** @jsx h **/
 
 import { h, component } from "../../dom";
+import { rmNodes } from "../../dom/api";
 import { ComponentTreeStep, VElement } from "../../dom/types";
 
 export type PortalProps = {
-  mount: HTMLElement;
+  mount?: HTMLElement;
   children: VElement;
 };
 
@@ -24,7 +25,7 @@ export const Portal = component<PortalProps>(
     }
   ) => {
     onUnmount((step: any) => {
-      if (step && step.dom && step.dom.remove) step.dom.remove();
+      if (step && step.dom) rmNodes(step.dom);
     });
     (parentStep as ComponentTreeStep).mount = props.mount;
     return props.children;
