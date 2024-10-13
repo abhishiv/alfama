@@ -41,9 +41,13 @@ export const reify = <T = unknown>(cursor: T): T => {
   const manager: StoreManager = getCursorProxyMeta<StoreManager>(
     s as unknown as ObjPathProxy<unknown, unknown>
   );
-  const cursorPath = getCursor(s);
-  const v = getValueUsingPath(manager.value as any, cursorPath);
-  return v as T;
+  if (manager) {
+    const cursorPath = getCursor(s);
+    const v = getValueUsingPath(manager.value as any, cursorPath);
+    return v as T;
+  } else {
+    return cursor;
+  }
 };
 
 export const produce = <T = unknown>(

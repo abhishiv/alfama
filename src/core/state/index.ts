@@ -4,3 +4,4 @@ export * from "./wire";
 export * from "./store";
 export * from "./storeAPI";
 export * from "./utils";
+export { dfsPreOrder } from "../../utils";

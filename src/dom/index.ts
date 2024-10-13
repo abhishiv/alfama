@@ -6,8 +6,10 @@ import {
   Component,
   ComponentVElement,
   NativeVElement,
+  RenderContext,
+  TreeStep,
 } from "./types";
-import { getRenderContext, renderTreeStep } from "./api";
+import { getRenderContext, renderTreeStep, rmNodes } from "./api";
 import { reifyTree } from "./traverser";
 import type {
   GenericEventAttrs,
@@ -17,7 +19,8 @@ import type {
   SVGElements,
   TargetedEvent,
 } from "./jsx";
-import { Wire } from "../core/state";
+import { runWire, StoreManager, Wire, wireReset } from "../core/state";
+import { getCursorProxyMeta } from "../utils";
 
 export * from "./types";
 export * as DOMConstants from "./constants";
@@ -27,7 +30,6 @@ export {
   insertElement,
   removeElement,
   updateElement,
-  unmount,
 } from "./api";
 export { reifyTree } from "./traverser";
 
@@ -73,6 +75,39 @@ export function render(
   //console.log("root", renderContext);
   renderTreeStep(renderContext, element);
   return renderContext;
+}
+
+export const unmount = (step: TreeStep) => {
+  if (step.dom) rmNodes(step.dom);
+};
+
+export function unrender(arg: RenderContext | TreeStep[]) {
+  const steps = Array.isArray(arg) ? arg : Array.from(arg.reg);
+  steps.forEach((step) => {
+    unmount(step);
+    if (step.type == DOMConstants.ComponentTreeStep) {
+      step.wires.forEach((w) => {
+        wireReset(w);
+      });
+      step.wires = [];
+      Object.values(step.state.stores).forEach((s) => {
+        const manager = getCursorProxyMeta<StoreManager>(s as any);
+        manager.tasks.clear();
+        manager.wires.clear();
+        // manager.unsubscribe();
+      });
+      step.onUnmount.forEach((el) => el(step));
+      // step.state.stores = {};
+      Object.values(step.state.signals).forEach((sig) => {
+        sig.wires.clear();
+      });
+      step.state.ctx.clear();
+    } else if (step.type == DOMConstants.WireTreeStep) {
+      const wire = step.node as Wire;
+      wireReset(wire);
+    }
+  });
+  return arg;
 }
 
 // used to store parent wire in context

@@ -1,12 +1,11 @@
 /** @jsx h **/
 
 import { h, component } from "../../dom";
-import { unmount } from "../../dom/api";
+import { rmNodes } from "../../dom/api";
 import { ComponentTreeStep, VElement } from "../../dom/types";
-import { getDescendants } from "../../dom/utils";
 
 export type PortalProps = {
-  mount: HTMLElement;
+  mount?: HTMLElement;
   children: VElement;
 };
 
@@ -26,14 +25,7 @@ export const Portal = component<PortalProps>(
     }
   ) => {
     onUnmount((step: any) => {
-      console.log("removeing Portal", step.dom);
-      const nodes = getDescendants(step).filter((el) => el !== step);
-      console.log("n", nodes);
-      nodes.forEach((el) => {
-        unmount(el);
-      });
-      //      unmount(step);
-      if (step && step.dom && step.dom.remove) step.dom.remove();
+      if (step && step.dom) rmNodes(step.dom);
     });
     (parentStep as ComponentTreeStep).mount = props.mount;
     return props.children;

@@ -109,10 +109,15 @@ export const runWire = (
   }
 };
 
-const wireReset = (wire: Wire<any>): void => {
+export const wireReset = (wire: Wire<any>): void => {
   wire.lower.forEach(wireReset);
   wire.sigRS.forEach((signal) => signal.wires.delete(wire));
-  // todo: handle stores here as well
+  wire.storesRS.forEach((store) => {
+    const manager = getCursorProxyMeta<StoreManager>(store);
+    if (manager) {
+      manager.wires.delete(wire);
+    }
+  });
   _initWire(wire);
 };
 

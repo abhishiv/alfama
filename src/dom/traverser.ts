@@ -161,7 +161,7 @@ export const getTreeStep = (
       return {
         type: DOMConstants.ComponentTreeStep,
         ...step,
-        state: { signals: {}, ctx: new WeakMap(), stores: {} },
+        state: { signals: {}, ctx: new Map(), stores: {} },
         wires: [],
         onMount: [],
         onUnmount: [],

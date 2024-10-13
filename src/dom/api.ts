@@ -24,10 +24,10 @@ import {
   StoreCursor,
   getProxyMeta,
   createComputedSignal,
-  StoreManager,
 } from "../core/state";
 import { LiveDocumentFragment } from "./dom";
 import { getCursorProxyMeta } from "../utils";
+import { unmount, unrender } from ".";
 
 export const insertElement = (
   renderContext: RenderContext,
@@ -166,43 +166,10 @@ export const addNode = (
 export const rmNodes = (node: Node | LiveDocumentFragment) => {
   if (node instanceof LiveDocumentFragment) {
     const childNodes = getLiveFragmentChildNodes(node);
+    //console.log("childNodes", childNodes.length, childNodes);
     childNodes.forEach((c) => c.parentNode?.removeChild(c));
   } else {
     node.parentElement?.removeChild(node);
-  }
-};
-
-export const unmount = (step: TreeStep) => {
-  if (step.type === DOMConstants.ComponentTreeStep) {
-    if (step.onUnmount.length > 0) step.onUnmount.forEach((el) => el(step));
-    step.wires.forEach((w) => {
-      w.storesRS.forEach((s, manager) => {
-        if (manager.wires.has(w)) {
-          manager.wires.delete(w);
-        }
-      });
-      w.sigRS.forEach((sig) => {
-        sig.wires.delete(w);
-      });
-      w.tasks.clear();
-      w.storesRS.clear();
-      w.sigRS.clear();
-    });
-    Object.values(step.state.signals).forEach((sig) => sig.wires.clear());
-    Object.values(step.state.stores).forEach((store) => {
-      const manager: StoreManager = getCursorProxyMeta(store);
-      manager.tasks.clear();
-      manager.wires.clear();
-      manager.unsubscribe();
-    });
-    step.wires = [];
-    if (step.mount) {
-      console.log("unount", step.mount, step.dom, step);
-    }
-    step.dom instanceof Node && rmNodes(step.dom);
-    for (var s in step.state.stores) {
-      // todo unsubscribe from store
-    }
   }
 };
 
@@ -210,9 +177,8 @@ export const removeNode = (renderCtx: RenderContext, node: TreeStep) => {
   //console.log("removeNodes", nodes);
   const nodes = getDescendants(node);
   //  console.log("removeNode nodes", node, nodes);
+  unrender(nodes);
   nodes.forEach((step) => {
-    unmount(step);
-    if (step.dom && step.dom instanceof Element) step.dom.remove();
     renderCtx.reg.delete(step);
     step.parent ? arrayRemove(step.parent.children, step) : null;
   });
@@ -220,8 +186,8 @@ export const removeNode = (renderCtx: RenderContext, node: TreeStep) => {
 
 export const renderTreeStep = (renderCtx: RenderContext, element: VElement) => {
   // todo: move this to getRenderContext so it clears DOM properly
+  //if (window.ss) return;
   renderCtx.el.innerHTML = "";
-
   const { root, registry } = reifyTree(renderCtx, element);
   const id = getVirtualElementId(root.node);
   if (!id) throw createError(101);
@@ -246,10 +212,23 @@ export const getRenderContext = (
       emitter: new EEmitter(),
     } as RenderContext);
 
+  //console.log("renderContext", renderContext);
   renderContext.prevState.clear();
-  // console.log("rendering", renderContext.reg);
+
   // so HMR is properly cleaned up
   renderContext.reg.forEach((step) => {
+    //console.log("step", step);
+    if (
+      step.type === DOMConstants.ComponentTreeStep &&
+      step.onUnmount.length > 0
+    )
+      step.onUnmount.forEach((el) => el(step));
+    if (step.type === DOMConstants.ComponentTreeStep) {
+      if (step.mount && step.dom) {
+        rmNodes(step.dom);
+      }
+    }
+
     if (step.type === DOMConstants.ComponentTreeStep) {
       const ids: string[] = [];
       let ancestor: TreeStep | undefined = step;
@@ -260,13 +239,17 @@ export const getRenderContext = (
         }
         ancestor = ancestor.parent;
       }
-      renderContext.prevState.set(ids, step.state);
+      // dont preserve stores for now
+      renderContext.prevState.set(ids, {
+        ...step.state,
+        stores: {},
+        signals: {},
+      });
     }
-    unmount(step);
   });
+  //if (window.ss) return;
 
   renderContext.reg.clear();
-
   (container as any)[id] = renderContext;
 
   return renderContext;
@@ -303,7 +286,7 @@ export const getUtils = (
     },
     wire(arg) {
       const w = createWire(arg);
-      parentStep.wires.push(w);
+      parentStep.wires?.push(w);
       return w;
     },
     store(name: string, val) {
