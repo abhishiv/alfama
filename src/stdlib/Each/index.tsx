@@ -71,7 +71,13 @@ export const Each: <T extends ArrayOrObject>(
         return props.cursor[index];
       } else {
         // debugger;
-        console.error("accessing no existent item", index, item, listValue);
+        console.error(
+          "accessing no existent item",
+          index,
+          item,
+          listValue,
+          listValue.length
+        );
       }
     };
 
@@ -109,6 +115,7 @@ export const Each: <T extends ArrayOrObject>(
 
       if (path.slice(0, listCursorPath.length).join("/") !== path.join("/"))
         return;
+      //      console.log("each", change, listCursorPath);
       if (data?.name === "push") {
         //        console.log("data", data);
         data.args.forEach((arg, i) => {

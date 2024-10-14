@@ -66,7 +66,15 @@ export function handleStoreChange(
   oldValue: any,
   changeData: ApplyData
 ) {
-  //  console.log("handleStoreChange", path, newValue, oldValue, changeData);
+  //  if (path[0] !== "state")
+  //    console.log(
+  //      "handleStoreChange",
+  //      path,
+  //      newValue,
+  //      oldValue,
+  //      changeData,
+  //      manager.value
+  //    );
   const changePath = path as string[];
   adjustCursorForArrayChange(manager, path as string[], changeData);
   const wiresToRun = findMatchingWires(manager, changePath, changeData);

@@ -180,6 +180,7 @@ export const removeNode = (renderCtx: RenderContext, node: TreeStep) => {
   unrender(nodes);
   nodes.forEach((step) => {
     renderCtx.reg.delete(step);
+    step;
     step.parent ? arrayRemove(step.parent.children, step) : null;
   });
 };
@@ -242,8 +243,8 @@ export const getRenderContext = (
       // dont preserve stores for now
       renderContext.prevState.set(ids, {
         ...step.state,
-        stores: {},
-        signals: {},
+        //stores: {},
+        //signals: {},
       });
     }
   });

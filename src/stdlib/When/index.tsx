@@ -36,11 +36,11 @@ export const When = component<WhenProps>(
     const underlying = utils.wire(props.condition);
     const value = underlying.run();
     const getView = (value: any) => {
-      //console.log("p", value, props.views, typeof props.views);
       if (typeof props.views === "function") {
         return () => (props.views as Function)(value);
       } else {
-        return props.views[value as unknown as any] || props.fallback;
+        const view = props.views[value as unknown as any];
+        return view || props.fallback;
       }
     };
     const task = (value: any) => {
