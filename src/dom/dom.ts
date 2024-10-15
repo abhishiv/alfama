@@ -120,6 +120,10 @@ const setAttributeValue = (
     } else {
       (el as HTMLElement).setAttribute(attr, val);
     }
+    if (el.tagName === "INPUT" && attr === "checked")
+      (el as HTMLInputElement).checked = !!val;
+    if (el.tagName === "INPUT" && attr === "value")
+      (el as HTMLInputElement).value = val;
   } catch (e) {
     console.error(el, attr, val);
     throw e;
