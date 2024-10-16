@@ -1,6 +1,23 @@
-export * from "./dom";
+export {
+  component,
+  h,
+  render,
+  unrender,
+  Fragment,
+  ParentWireContext,
+  defineContext,
+} from "./dom";
 export type * from "./dom";
-export * from "./core/state";
+export {
+  createSignal,
+  createWire,
+  createStore,
+  createComputedSignal,
+  produce,
+  reify,
+  getProxyMeta,
+} from "./core/state";
+export type * from "./core/state";
 export * from "./stdlib/index";
 export * from "./utils/index";
 
