@@ -1,17 +1,16 @@
-import * as Constants from "../core/constants";
-import {
-  BaseTreeStep,
-  Context,
-  Component,
-  VElement,
-  TreeStep,
-  ComponentTreeStepState,
-  NativeVElement,
-  ComponentVElement,
-  RenderContext,
-} from "./types";
 import { crawl } from "../utils/crawl";
 import * as DOMConstants from "./constants";
+import {
+  BaseTreeStep,
+  Component,
+  ComponentTreeStepState,
+  ComponentVElement,
+  Context,
+  NativeVElement,
+  RenderContext,
+  TreeStep,
+  VElement,
+} from "./types";
 
 export const getDescendants = (node: TreeStep): TreeStep[] => {
   const nodes: TreeStep[] = [];

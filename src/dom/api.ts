@@ -1,32 +1,30 @@
-import {
-  VElement,
-  TreeStep,
-  RenderContext,
-  ComponentTreeStep,
-  ComponentUtils,
-} from "./types";
-import {
-  getDescendants,
-  getContextProvider,
-  createError,
-  getVirtualElementId,
-  arrayRemove,
-  getTreeStepRenderContextState,
-} from "./utils";
-import * as DOMConstants from "./constants";
-import { reifyTree } from "./traverser";
+import { unrender } from ".";
 import {
   Signal,
-  createSignal,
-  createWire,
-  createStore,
   StoreCursor,
-  getProxyMeta,
   createComputedSignal,
+  createSignal,
+  createStore,
+  createWire,
 } from "../core/state";
+import * as DOMConstants from "./constants";
 import { LiveDocumentFragment } from "./dom";
-import { getCursorProxyMeta } from "../utils";
-import { unmount, unrender } from ".";
+import { reifyTree } from "./traverser";
+import {
+  ComponentTreeStep,
+  ComponentUtils,
+  RenderContext,
+  TreeStep,
+  VElement,
+} from "./types";
+import {
+  arrayRemove,
+  createError,
+  getContextProvider,
+  getDescendants,
+  getTreeStepRenderContextState,
+  getVirtualElementId,
+} from "./utils";
 
 export const insertElement = (
   renderContext: RenderContext,
