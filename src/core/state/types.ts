@@ -91,7 +91,7 @@ export type Wire<T = unknown> = {
   run: () => T;
 
   // Signals/Stores read-subscribed last run
-  sigs: Set<Signal>;
+  sigs: Set<Signal<any>>;
   stores: Map<StoreManager, Set<string>>;
 
   // Post-run tasks

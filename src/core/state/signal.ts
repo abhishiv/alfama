@@ -4,36 +4,39 @@ export {
   getCursor as getProxyPath,
 } from "../../utils/index";
 export type { ObjPathProxy } from "../../utils/index";
-import { Signal, SubToken, Wire } from "./types";
+import { Signal, SignalGetter, SignalSetter, SubToken, Wire } from "./types";
 import { runWires } from "./wire";
 
 let SIGNAL_COUNTER = 0;
 
 export const createSignal = <T = any>(val: T): Signal<T> => {
   SIGNAL_COUNTER++;
-  function get(token?: SubToken) {
+  const get: SignalGetter<T> = (token?: SubToken) => {
     if (token) {
       // Two-way link. Signal writes will now call/update wire W
       token.wire.sigs.add(sig);
-      sig.wires.add(token.wire);
-      return sig.value as T;
+      sig.w.add(token.wire);
+      return sig.v as T;
     } else {
-      return sig.value as T;
+      return sig.v as T;
     }
-  }
+  };
+  get.type = Constants.SIGNAL_GETTER;
 
-  const set = (value: T) => {
-    if (sig.value === value) return value;
-    sig.value = value;
-    runWires(sig.wires);
+  const set: SignalSetter<T> = (value: T) => {
+    if (sig.v === value) return value;
+    sig.v = value;
+    runWires(sig.w);
     return val;
   };
 
-  const sig: any = [get, set];
+  const sig = [get, set] as unknown as Signal<T>;
   sig.id = "signal|" + SIGNAL_COUNTER;
   sig.type = Constants.SIGNAL;
-  sig.value = val;
-  sig.wires = new Set<Wire>();
+  sig.v = val;
+  sig.w = new Set<Wire>();
+
+  get.sig = sig;
 
   sig.get = get;
   sig.set = set;
