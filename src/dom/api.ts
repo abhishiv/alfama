@@ -40,13 +40,13 @@ export const insertElement = (
 
   const step = parentPath.reduce<TreeStep | undefined>((step, key) => {
     if (!step) return;
-    const child = step.children.find((el) => el.id === key);
+    const child = step.k.find((el) => el.id === key);
     return child;
   }, parentStep);
   if (!step) throw new Error("");
 
   const afterIndex = after
-    ? step.children.findIndex((el) => el.id === after)
+    ? step.k.findIndex((el) => el.id === after)
     : undefined;
 
   const { root, registry } = reifyTree(renderContext, el, step, afterIndex);
@@ -55,9 +55,7 @@ export const insertElement = (
     renderContext,
     step,
     root,
-    afterIndex && afterIndex > -1
-      ? step.children[afterIndex as number]
-      : undefined
+    afterIndex && afterIndex > -1 ? step.k[afterIndex as number] : undefined
   );
 };
 
@@ -69,11 +67,11 @@ export const removeElement = (
 ) => {
   const step = parentPath.reduce<TreeStep | undefined>((step, key) => {
     if (!step) return;
-    const child = step.children.find((el) => el.id === key);
+    const child = step.k.find((el) => el.id === key);
     return child;
   }, parentStep);
   if (!step) throw createError(102);
-  const child = step.children.find((el) => el.id === key);
+  const child = step.k.find((el) => el.id === key);
   if (!child) throw createError(102);
   removeNode(renderContext, child);
 };
@@ -123,15 +121,15 @@ export const addNode = (
       node.parent = parentStep;
       if (parentStep && before) {
         const elementsToInsert = node.dom;
-        const beforeIndex = parentStep.children.indexOf(before);
-        parentStep.children.splice(beforeIndex, 0, node);
+        const beforeIndex = parentStep.k.indexOf(before);
+        parentStep.k.splice(beforeIndex, 0, node);
 
         const refNode: HTMLElement = before.dom as HTMLElement;
         refNode.before(elementsToInsert);
       } else if (parentStep) {
         const parentDOM = parentStep.dom;
         const elementsToInsert = node.dom;
-        parentStep.children.push(node);
+        parentStep.k.push(node);
         if (parentDOM && (parentDOM as HTMLElement)) {
           parentDOM.append(elementsToInsert);
         }
@@ -181,7 +179,7 @@ export const removeNode = (renderCtx: RenderContext, node: TreeStep) => {
   nodes.forEach((step) => {
     renderCtx.reg.delete(step);
     step;
-    step.parent ? arrayRemove(step.parent.children, step) : null;
+    step.parent ? arrayRemove(step.parent.k, step) : null;
   });
 };
 
@@ -268,10 +266,10 @@ export const getUtils = (
 
       // this enables state preservation during HMR
       const s =
-        match && match.signals && match.signals[name]
-          ? (match.signals[name] as Signal<any>)
+        match && match.sigs && match.sigs[name]
+          ? (match.sigs[name] as Signal<any>)
           : (createSignal(val) as Signal<any>);
-      parentStep.state.signals[name] = s;
+      parentStep.state.sigs[name] = s;
       return s;
     },
     computedSignal(name: string, wire) {
@@ -279,10 +277,10 @@ export const getUtils = (
 
       // this enables state preservation during HMR
       const s =
-        match && match.signals && match.signals[name]
-          ? (match.signals[name] as Signal<any>)
+        match && match.sigs && match.sigs[name]
+          ? (match.sigs[name] as Signal<any>)
           : (createComputedSignal(wire) as Signal<any>);
-      parentStep.state.signals[name] = s;
+      parentStep.state.sigs[name] = s;
       return s;
     },
     wire(arg) {

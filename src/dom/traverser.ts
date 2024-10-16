@@ -38,7 +38,7 @@ export const reifyTree = (
       registry.push(step);
       // step.parent.children.push shouldnt be done here for root.parent at least
       // reason more about it: maybe reifyTree shouldn't take parent as prop?
-      if (step !== root && step.parent) step.parent.children.push(step);
+      if (step !== root && step.parent) step.parent.k.push(step);
       const isSVG = checkIfSVG(step);
       const dom = createDOMNode(step, isSVG);
       if (dom) {
@@ -133,7 +133,7 @@ export const getTreeStep = (
       node: el,
       meta,
       parent: parentStep,
-      children: [],
+      k: [],
     };
     if (
       el === null ||
@@ -161,7 +161,7 @@ export const getTreeStep = (
       return {
         type: DOMConstants.ComponentTreeStep,
         ...step,
-        state: { signals: {}, ctx: new Map(), stores: {} },
+        state: { sigs: {}, ctx: new Map(), stores: {} },
         wires: [],
         onMount: [],
         onUnmount: [],

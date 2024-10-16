@@ -98,7 +98,7 @@ export function unrender(arg: RenderContext | TreeStep[]) {
       });
       step.onUnmount.forEach((el) => el(step));
       // step.state.stores = {};
-      Object.values(step.state.signals).forEach((sig) => {
+      Object.values(step.state.sigs).forEach((sig) => {
         sig.wires.clear();
       });
       step.state.ctx.clear();

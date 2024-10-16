@@ -1,6 +1,6 @@
 {
   "name": "alfama",
-  "version": "1.3.5",
+  "version": "1.3.6",
   "author": "Abhishiv Saxena<abhishiv@gmail.com>",
   "license": "MIT",
   "description": "Fine-grained reactive library with no compiler, no magic, and no virtual DOM",

@@ -20,19 +20,7 @@ export type WhenProps = {
 
 export const When = component<WhenProps>(
   "When",
-  (
-    props,
-    {
-      wire,
-      setContext,
-      signal,
-      utils,
-      onUnmount,
-      onMount,
-      step: parentStep,
-      renderContext,
-    }
-  ) => {
+  (props, { utils, onUnmount, onMount, step: parentStep, renderContext }) => {
     const underlying = utils.wire(props.condition);
     const value = underlying.run();
     const getView = (value: any) => {
@@ -46,10 +34,12 @@ export const When = component<WhenProps>(
     const task = (value: any) => {
       const view = getView(value);
       const u = view ? view() : null;
-      const previousChildren = [...parentStep.children];
+      const previousChildren = [...parentStep.k];
       const { registry, root } = reifyTree(renderContext, u, parentStep);
       addNode(renderContext, parentStep, root);
-      previousChildren.forEach((n) => removeNode(renderContext, n));
+      for (var n of previousChildren) {
+        removeNode(renderContext, n);
+      }
     };
     onMount(() => {
       underlying.tasks.add(task);

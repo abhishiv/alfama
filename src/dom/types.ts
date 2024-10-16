@@ -44,7 +44,7 @@ export interface NativeVElement extends VElementBase {
   type: typeof DOMConstants.NATIVE;
   t: string;
   p: Record<string, any> & {
-    children: VElement[];
+    k: VElement[];
   };
 }
 
@@ -53,7 +53,7 @@ export interface ComponentVElement<T = any> extends VElementBase {
   type: typeof DOMConstants.COMPONENT;
   t: Component<T>;
   p: Record<string, any> & {
-    children: VElement[];
+    k: VElement[];
   };
 }
 
@@ -72,7 +72,7 @@ export type BaseTreeStep = {
   id?: string;
   parent?: TreeStep;
   meta?: Record<string, any>;
-  children: Array<TreeStep>;
+  k: Array<TreeStep>;
 };
 
 export interface NativeTreeStep extends BaseTreeStep {
@@ -91,7 +91,7 @@ export interface ComponentTreeStep extends BaseTreeStep {
 }
 
 export interface ComponentTreeStepState {
-  signals: Record<string, Signal>;
+  sigs: Record<string, Signal>;
   stores: Record<string, StoreCursor>;
   ctx: Map<any, any>;
 }

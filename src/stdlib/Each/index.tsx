@@ -84,8 +84,8 @@ export const Each: <T extends ArrayOrObject>(
     const observor = function (change: StoreChange) {
       const { data, path, value } = change;
       //console.log("Each list change", change, listCursorPath, path);
-      const pStep = parentStep.children[0];
-      const previousChildren = [...(pStep.children || [])];
+      const pStep = parentStep.k[0];
+      const previousChildren = [...(pStep.k || [])];
       // list reset
       if (listCursorPath.join() === path.join() && !data) {
         previousChildren.forEach((node) => {
@@ -93,7 +93,7 @@ export const Each: <T extends ArrayOrObject>(
         });
         const startIndex = 0;
         (value as typeof props.cursor).forEach((item, index) => {
-          const previousChildren = [...(pStep.children || [])];
+          const previousChildren = [...(pStep.k || [])];
           const { treeStep, el } = renderArray(
             pStep,
             props.renderItem,
@@ -161,7 +161,7 @@ export const Each: <T extends ArrayOrObject>(
         // Add the new nodes being spliced in
         items.forEach((item, i) => {
           const index = startIndex + i;
-          const previousChildren = [...(pStep.children || [])];
+          const previousChildren = [...(pStep.k || [])];
           const { treeStep, el } = renderArray(
             pStep,
             props.renderItem,
