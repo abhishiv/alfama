@@ -8,7 +8,7 @@ import {
 
 export type { ObjPathProxy } from "./ts-object-path";
 export { PATH_FLAG } from "./ts-object-path";
-export const META_FLAG = Symbol("META_FLAG");
+export const META_FLAG = Symbol();
 
 export type CursorProxy<T = unknown, V = unknown> = ObjPathProxy<T, T>;
 

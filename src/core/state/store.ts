@@ -14,10 +14,10 @@ const encodeCursor = (cursor: string[]) =>
 const decodeCursor = (str: string) => str.split("/").map(decodeURIComponent);
 
 // Create the store manager with essential functionalities
-export function createStoreManager<T>(
+export const createStoreManager = <T>(
   id: number,
   observedObject: Record<any, any>
-): StoreManager<T> {
+): StoreManager<T> => {
   const manager: StoreManager<T> = {
     id: "store|" + id,
     value: observedObject,
@@ -31,14 +31,14 @@ export function createStoreManager<T>(
       createStoreSubscription(manager, cursor, token.wire),
   };
   return manager;
-}
+};
 
 // Get the value from the store based on a cursor path
-function createStoreSubscription<T>(
+const createStoreSubscription = <T>(
   manager: StoreManager,
   cursor: StoreCursor,
   wire: Wire
-): any {
+): any => {
   const cursorPath = getCursor(cursor);
   const encodedCursor = encodeCursor(cursorPath);
   manager.wires.add(wire);
@@ -56,16 +56,16 @@ function createStoreSubscription<T>(
     console.log(wire, wire.storesRS, encodedCursor, manager.value);
     throw e;
   }
-}
+};
 
 // Handle changes in the store and trigger associated tasks and wires
-export function handleStoreChange(
+export const handleStoreChange = (
   manager: StoreManager,
   path: (string | symbol)[],
   newValue: any,
   oldValue: any,
   changeData: ApplyData
-) {
+) => {
   //  if (path[0] !== "state")
   //    console.log(
   //      "handleStoreChange",
@@ -80,14 +80,14 @@ export function handleStoreChange(
   const wiresToRun = findMatchingWires(manager, changePath, changeData);
   runWires(wiresToRun);
   triggerStoreTasks(manager, changePath, newValue, changeData);
-}
+};
 
 // Find wires that match the change path
-function findMatchingWires(
+const findMatchingWires = (
   manager: StoreManager,
   changePath: string[],
   changeData: ApplyData
-): Set<Wire> {
+): Set<Wire> => {
   const matchingWires = new Set<Wire>();
 
   manager.wires.forEach((wire) => {
@@ -105,14 +105,14 @@ function findMatchingWires(
   });
 
   return matchingWires;
-}
+};
 
 // Determine if a cursor matches the change path
-function matchCursorToChange(
+const matchCursorToChange = (
   cursor: string[],
   changePath: string[],
   changeData: ApplyData
-): boolean {
+): boolean => {
   if (changeData === undefined) {
     return cursor.length <= changePath.length
       ? encodeCursor(changePath.slice(0, cursor.length)) == cursor.join("/")
@@ -124,15 +124,15 @@ function matchCursorToChange(
   }
 
   return false;
-}
+};
 
 // Trigger tasks based on the change path
-function triggerStoreTasks(
+const triggerStoreTasks = (
   manager: StoreManager,
   changePath: string[],
   newValue: any,
   changeData: ApplyData
-) {
+) => {
   manager.tasks.forEach(({ path, observor }) => {
     const isPathMatching =
       changePath.slice(0, path.length).join("/") === path.join("/");
@@ -150,7 +150,7 @@ function triggerStoreTasks(
       });
     }
   });
-}
+};
 
 //
 // Function to adjust cursor paths for array changes
@@ -171,7 +171,7 @@ function adjustCursorForArrayChange(
 
   manager.wires.forEach((wire) => {
     wire.storesRS.forEach((cursorSet) => {
-      const { toRemove, toAdd } = adjustCursorsInSet(
+      const { rm: toRemove, add: toAdd } = adjustCursorsInSet(
         cursorSet,
         changePath,
         start,
@@ -205,7 +205,7 @@ function adjustCursorsInSet(
   start: number,
   deleteCount: number,
   items: any[]
-): { toRemove: string[]; toAdd: string[] } {
+): { rm: string[]; add: string[] } {
   const toRemove: string[] = [];
   const toAdd: string[] = [];
 
@@ -226,7 +226,7 @@ function adjustCursorsInSet(
     }
   });
 
-  return { toRemove, toAdd };
+  return { rm: toRemove, add: toAdd };
 }
 
 function isPathMatching(cursor: string[], changePath: string[]): boolean {

@@ -11,19 +11,7 @@ export type PortalProps = {
 
 export const Portal = component<PortalProps>(
   "Portal",
-  (
-    props,
-    {
-      wire,
-      setContext,
-      signal,
-      utils,
-      onUnmount,
-      onMount,
-      step: parentStep,
-      renderContext,
-    }
-  ) => {
+  (props, { onUnmount, step: parentStep }) => {
     onUnmount((step: any) => {
       if (step && step.dom) rmNodes(step.dom);
     });

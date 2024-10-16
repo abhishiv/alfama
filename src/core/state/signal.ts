@@ -22,12 +22,12 @@ export const createSignal = <T = any>(val: T): Signal<T> => {
     }
   }
 
-  function set(value: T) {
+  const set = (value: T) => {
     if (sig.value === value) return value;
     sig.value = value;
     runWires(sig.wires);
     return val;
-  }
+  };
 
   const sig: any = [get, set];
   sig.id = "signal|" + SIGNAL_COUNTER;

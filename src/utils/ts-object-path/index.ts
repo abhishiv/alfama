@@ -6,7 +6,7 @@ export type ObjProxyArg<TRoot, T> =
   | ObjPathProxy<TRoot, T>
   | ((p: ObjPathProxy<TRoot, TRoot>) => ObjPathProxy<TRoot, T>);
 
-export const PATH_FLAG = Symbol("Object path");
+export const PATH_FLAG = Symbol();
 
 export function createProxy<T>(
   path: PropertyKey[] = [],
