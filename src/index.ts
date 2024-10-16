@@ -19,7 +19,7 @@ export {
 } from "./core/state";
 export type * from "./core/state";
 export * from "./stdlib/index";
-export * from "./utils/index";
+export { getValueUsingPath } from "./utils/index";
 
 import { Signal } from "./core";
 import { ComponentUtils } from "./dom";

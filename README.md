@@ -16,7 +16,7 @@
 #### Features
 
 - **Rich and Complete:** From support for `SVG` to popular patterns like `dangerouslySetInnerHTML`, `ref` to `<Fragment>` and `<Portal />` alfama has you covered.
-- **Small:** Fully featured at `~10kB` gzip.
+- **Small:** Fully featured at `~9kB` gzip.
 - **Truly reactive and fine grained:** Unlike VDOM libraries which use diffing to compute changes, it uses fine grained updates to target only the DOM which needs to update.
 - **No Magic:** Explicit subscriptions obviate the need of [`sample`](https://github.com/luwes/sinuous/blob/8d1aa0cdb8a25e6bfcdf34f022523564a9adb533/src/observable.js#L34-L49)/[`untrack`](https://github.com/vobyjs/voby#untrack) methods found in other fine grained reactive libraries like solid/sinuous. _Importantly, many feel that this also makes your code easy to reason about._
 - **Signals and Stores:** Signals for primitives and Stores for deeply nested objects/arrays.
