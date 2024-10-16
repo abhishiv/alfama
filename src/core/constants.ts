@@ -1,5 +1,5 @@
-export const WIRE = Symbol("WIRE");
-export const SIGNAL = Symbol("SIGNAL");
-export const STORE = Symbol("STORE");
-export const SUBTOKEN = Symbol("SUBTOKEN");
-export const SIGNAL_GETTER = Symbol("SIGNAL_GETTER");
+export const WIRE = 0 as const;
+export const SIGNAL = 1 as const;
+export const STORE = 2 as const;
+export const SUBTOKEN = 3 as const;
+export const SIGNAL_GETTER = 4 as const;

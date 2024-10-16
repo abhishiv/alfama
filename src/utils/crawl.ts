@@ -16,15 +16,15 @@ export const dfsPostOrder = <T>(
   kids: (node: T) => T[]
 ) => {
   // The stack holds the nodes we need to visit.
-  const stack: { node: T; visitedChildren: boolean }[] = [];
+  const stack: { node: T; v: boolean }[] = [];
   // Keep track of the nodes we've visited.
   const visited = new Set();
 
   // Push the root node onto the stack to start the traversal.
-  stack.push({ node: root, visitedChildren: false });
+  stack.push({ node: root, v: false });
 
   while (stack.length > 0) {
-    const { node, visitedChildren } = stack[stack.length - 1];
+    const { node, v: visitedChildren } = stack[stack.length - 1];
     // If all the node's children have been visited, visit the node and pop it from the stack.
     if (visitedChildren) {
       iterate(node);
@@ -32,12 +32,12 @@ export const dfsPostOrder = <T>(
     } else {
       visited.add(node);
       // Mark that we've visited the node's children.
-      stack[stack.length - 1].visitedChildren = true;
+      stack[stack.length - 1].v = true;
       // Otherwise, push all the unvisited children onto the stack.
       const children = (kids(node) || []).reverse();
       children.forEach((child) => {
         if (!visited.has(child)) {
-          stack.push({ node: child, visitedChildren: false });
+          stack.push({ node: child, v: false });
         }
       });
     }
