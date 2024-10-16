@@ -14,7 +14,7 @@ export const createSignal = <T = any>(val: T): Signal<T> => {
   function get(token?: SubToken) {
     if (token) {
       // Two-way link. Signal writes will now call/update wire W
-      token.wire.sigRS.add(sig);
+      token.wire.sigs.add(sig);
       sig.wires.add(token.wire);
       return sig.value as T;
     } else {
@@ -45,7 +45,7 @@ export const createComputedSignal = <T = any>(wire: Wire<T>) => {
   const value = wire.run();
   const signal = createSignal<T>(value);
   const handler = () => {
-    if (signal.get() !== wire.value) signal.set(wire.value as T);
+    if (signal.get() !== wire.v) signal.set(wire.v as T);
   };
   wire.tasks.add(handler);
   return signal;

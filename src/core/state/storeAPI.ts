@@ -43,7 +43,7 @@ export const reify = <T = unknown>(cursor: T): T => {
   );
   if (manager) {
     const cursorPath = getCursor(s);
-    const v = getValueUsingPath(manager.value as any, cursorPath);
+    const v = getValueUsingPath(manager.v as any, cursorPath);
     return v as T;
   } else {
     return cursor;

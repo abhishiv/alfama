@@ -93,13 +93,13 @@ export function unrender(arg: RenderContext | TreeStep[]) {
       Object.values(step.state.stores).forEach((s) => {
         const manager = getCursorProxyMeta<StoreManager>(s as any);
         manager.tasks.clear();
-        manager.wires.clear();
+        manager.w.clear();
         // manager.unsubscribe();
       });
       step.onUnmount.forEach((el) => el(step));
       // step.state.stores = {};
       Object.values(step.state.sigs).forEach((sig) => {
-        sig.wires.clear();
+        sig.w.clear();
       });
       step.state.ctx.clear();
     } else if (step.type == DOMConstants.WireTreeStep) {

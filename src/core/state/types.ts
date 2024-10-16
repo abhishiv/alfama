@@ -19,11 +19,11 @@ export type SignalAPI<T = any> = [SignalGetter<T>, SignalSetter<T>];
 export type Signal<T = unknown> = SignalAPI & {
   id: string;
   /** Wires subscribed to this signal */
-  wires: Set<Wire<any>>;
+  w: Set<Wire<any>>;
   /** To check "if x is a signal" */
   type: typeof Constants.SIGNAL;
 
-  value: T;
+  v: T;
   get: SignalGetter<T>;
   set: SignalSetter<T>;
 };
@@ -53,17 +53,17 @@ type extractGeneric<Type> = Type extends ObjPathProxy<unknown, infer X>
 
 export type StoreManager<T = unknown> = {
   id: string;
-  value: T;
+  v: T;
   rootCursor?: StoreCursor;
   /** Wires subscribed to this signal */
-  wires: Set<Wire<any>>;
+  w: Set<Wire<any>>;
   type: typeof Constants.STORE;
   tasks: Set<{
     path: string[];
     observor: (change: StoreChange) => void;
   }>;
   get: (cursor: StoreCursor, token: SubToken) => any;
-  unsubscribe: Function;
+  unsub: Function;
 };
 
 export type StoreChangeData = ApplyData;
@@ -84,15 +84,15 @@ export type Wire<T = unknown> = {
   fn: WireFunction<T> | StoreCursor;
   // FSM state 3-bit bitmask: [RUNNING][SKIP_RUN_QUEUE][NEEDS_RUN]
   state: WireState;
-  runCount: number;
-  value?: T;
+  r: number;
+  v?: T;
 
   // Run the wire
   run: () => T;
 
   // Signals/Stores read-subscribed last run
-  sigRS: Set<Signal>;
-  storesRS: Map<StoreManager, Set<string>>;
+  sigs: Set<Signal>;
+  stores: Map<StoreManager, Set<string>>;
 
   // Post-run tasks
   tasks: Set<(nextValue: T) => void>;

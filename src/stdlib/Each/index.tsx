@@ -52,7 +52,7 @@ export const Each: <T extends ArrayOrObject>(
     //    console.log("Each", listCursorPath);
 
     const listValue: typeof listCursor = getValueUsingPath(
-      store.value as any,
+      store.v as any,
       listCursorPath
     ) as typeof listCursor;
     //console.log("value", value);
@@ -62,7 +62,7 @@ export const Each: <T extends ArrayOrObject>(
     const getItemCursor = (item: ExtractElement<typeof listCursor>) => {
       const store: StoreManager = (listCursor as any)[META_FLAG];
       const listValue: typeof listCursor = getValueUsingPath(
-        store.value as any,
+        store.v as any,
         listCursorPath
       ) as typeof listCursor;
       //      console.log("listValue", listValue, item);

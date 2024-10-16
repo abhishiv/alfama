@@ -20,11 +20,11 @@ export const createStoreManager = <T>(
 ): StoreManager<T> => {
   const manager: StoreManager<T> = {
     id: "store|" + id,
-    value: observedObject,
-    wires: new Set<Wire>(),
+    v: observedObject,
+    w: new Set<Wire>(),
     type: Constants.STORE,
     tasks: new Set(),
-    unsubscribe: () => {
+    unsub: () => {
       onChange.unsubscribe(observedObject);
     },
     get: (cursor: StoreCursor, token: SubToken) =>
@@ -41,19 +41,19 @@ const createStoreSubscription = <T>(
 ): any => {
   const cursorPath = getCursor(cursor);
   const encodedCursor = encodeCursor(cursorPath);
-  manager.wires.add(wire);
-  if (wire.storesRS.has(manager)) {
-    wire.storesRS.get(manager)?.add(encodedCursor);
+  manager.w.add(wire);
+  if (wire.stores.has(manager)) {
+    wire.stores.get(manager)?.add(encodedCursor);
   } else {
     const set = new Set<string>();
     set.add(encodedCursor);
-    wire.storesRS.set(manager, set);
+    wire.stores.set(manager, set);
   }
   try {
-    const v = getValueUsingPath(manager.value as any, cursorPath);
+    const v = getValueUsingPath(manager.v as any, cursorPath);
     return v;
   } catch (e) {
-    console.log(wire, wire.storesRS, encodedCursor, manager.value);
+    console.log(wire, wire.stores, encodedCursor, manager.v);
     throw e;
   }
 };
@@ -90,8 +90,8 @@ const findMatchingWires = (
 ): Set<Wire> => {
   const matchingWires = new Set<Wire>();
 
-  manager.wires.forEach((wire) => {
-    const cursors = wire.storesRS.get(manager);
+  manager.w.forEach((wire) => {
+    const cursors = wire.stores.get(manager);
     if (!cursors) return;
 
     for (const cursorStr of cursors) {
@@ -169,8 +169,8 @@ function adjustCursorForArrayChange(
 
   //  console.log("adjustCursorForArrayChange", { start, deleteCount });
 
-  manager.wires.forEach((wire) => {
-    wire.storesRS.forEach((cursorSet) => {
+  manager.w.forEach((wire) => {
+    wire.stores.forEach((cursorSet) => {
       const { rm: toRemove, add: toAdd } = adjustCursorsInSet(
         cursorSet,
         changePath,

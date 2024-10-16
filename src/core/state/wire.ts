@@ -29,13 +29,13 @@ export const createWire: WireFactory = (arg: WireFunction): Wire => {
     id: "wire|" + WIRE_COUNTER,
     type: Constants.WIRE,
     fn: arg,
-    sigRS: new Set(),
-    storesRS: new Map(),
+    sigs: new Set(),
+    stores: new Map(),
     tasks: new Set(),
     state: S_NEEDS_RUN,
     upper: undefined,
     lower: new Set(),
-    runCount: 0,
+    r: 0,
     run: () => {
       const val = runWire(arg, wire.token, wire.subWire);
       // Clean up unused nested wires
@@ -57,18 +57,18 @@ const getSubtoken = (wire: Wire): SubToken => {
   const token: SubToken = (arg: Signal | StoreCursor | SignalGetter) => {
     if (isSignal(arg)) {
       const v = arg.get(token);
-      wire.value = v;
+      wire.v = v;
       return v;
     } else if (isSignalGetter(arg)) {
       const sig = arg.sig;
       const v = sig.get(token);
-      wire.value = v;
+      wire.v = v;
       return v;
     } else if (isStoreCursor(arg)) {
       const cursor = arg;
       const manager = getCursorProxyMeta<StoreManager>(cursor);
       const v = manager.get(cursor, token);
-      wire.value = v;
+      wire.v = v;
       return v;
     }
   };
@@ -85,37 +85,37 @@ export const runWire = (
   if (isStoreCursor(arg)) {
     const cursor = arg;
     const v = token(cursor);
-    token.wire.value = v;
+    token.wire.v = v;
     return v;
   } else if (isSignal(arg)) {
     const sig = arg;
     const v = token(sig);
-    token.wire.value = v;
+    token.wire.v = v;
     return v;
   } else if (isSignalGetter(arg)) {
     const sig = arg.sig;
     const v = token(sig);
-    token.wire.value = v;
+    token.wire.v = v;
     return v;
   } else {
     const fn = arg as WireFunction;
     const v = fn(token, {
       createWire: subWireFactory,
       wire: subWireFactory,
-      previousValue: token.wire.value,
+      previousValue: token.wire.v,
     });
-    token.wire.value = v;
+    token.wire.v = v;
     return v;
   }
 };
 
 export const wireReset = (wire: Wire<any>): void => {
   wire.lower.forEach(wireReset);
-  wire.sigRS.forEach((signal) => signal.wires.delete(wire));
-  wire.storesRS.forEach((store) => {
+  wire.sigs.forEach((signal) => signal.w.delete(wire));
+  wire.stores.forEach((store) => {
     const manager = getCursorProxyMeta<StoreManager>(store);
     if (manager) {
-      manager.wires.delete(wire);
+      manager.w.delete(wire);
     }
   });
   _initWire(wire);
@@ -125,8 +125,8 @@ const _initWire = (wire: Wire<any>): void => {
   wire.state = S_NEEDS_RUN;
   wire.lower = new Set();
   // Drop all signals now that they have been unlinked
-  wire.sigRS = new Set();
-  wire.storesRS = new Map();
+  wire.sigs = new Set();
+  wire.stores = new Map();
 };
 
 // Pauses a wire so signal writes won't cause runs. Affects nested wires
@@ -160,13 +160,13 @@ export const runWires = (wires: Set<Wire<any>>): void => {
     while ((curr = curr.upper)) if (toRun.has(curr)) return toRun.delete(wire);
   });
   toRun.forEach((wire) => {
-    const previousValue = wire.value;
+    const previousValue = wire.v;
     const val = runWire(wire.fn, wire.token, wire.subWire);
 
-    wire.runCount = wire.runCount + 1;
+    wire.r = wire.r + 1;
     if (val === previousValue) return;
 
-    wire.value = val;
+    wire.v = val;
     for (const task of wire.tasks) {
       task(val);
     }
