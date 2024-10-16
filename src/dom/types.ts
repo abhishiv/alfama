@@ -118,31 +118,9 @@ export interface RenderContext {
   el: Element;
   prevState: Map<string[], ComponentTreeStepState>;
   reg: Set<TreeStep>;
-  emitter: EEmitter;
 }
 
 // Context like you'll find in react/solid
 export type Context<T = Signal | StoreCursor> = {
   sym: symbol;
 };
-
-export class EEmitter {
-  t: EventTarget;
-  constructor() {
-    this.t = new EventTarget();
-  }
-  on(eventName: string, listener: EventListenerOrEventListenerObject | null) {
-    return this.t.addEventListener(eventName, listener);
-  }
-  once(eventName: string, listener: EventListenerOrEventListenerObject | null) {
-    return this.t.addEventListener(eventName, listener, { once: true });
-  }
-  off(eventName: string, listener: EventListenerOrEventListenerObject | null) {
-    return this.t.removeEventListener(eventName, listener);
-  }
-  emit(eventName: string, detail: any) {
-    return this.t.dispatchEvent(
-      new CustomEvent(eventName, { detail, cancelable: true })
-    );
-  }
-}

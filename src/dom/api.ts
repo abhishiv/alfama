@@ -4,7 +4,6 @@ import {
   RenderContext,
   ComponentTreeStep,
   ComponentUtils,
-  EEmitter,
 } from "./types";
 import {
   getDescendants,
@@ -201,15 +200,12 @@ export const getRenderContext = (
   const id = getVirtualElementId(element);
   if (!id) throw createError(101);
 
-  const renderContext: RenderContext =
-    (container as any)[id] ||
-    ({
-      prevState: new Map(),
-      el: container,
-      id,
-      reg: new Set(),
-      emitter: new EEmitter(),
-    } as RenderContext);
+  const renderContext: RenderContext = (container as any)[id] || {
+    prevState: new Map(),
+    el: container,
+    id,
+    reg: new Set(),
+  };
 
   //console.log("renderContext", renderContext);
   renderContext.prevState.clear();
