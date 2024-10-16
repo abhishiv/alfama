@@ -16,6 +16,7 @@ import { TreeStep } from "../../dom/types";
 import { getUtils, addNode, removeNode } from "../../dom/api";
 import { reifyTree, getTreeStep } from "../../dom/traverser";
 import { getValueUsingPath } from "../../utils/index";
+import { createError } from "../../dom/utils";
 
 export const Each: <T extends ArrayOrObject>(
   props: {
@@ -42,10 +43,6 @@ export const Each: <T extends ArrayOrObject>(
       onUnmount,
     }
   ) => {
-    // todo: important memory leak
-    const $rootWire = wire(($: SubToken) => {});
-    setContext(ParentWireContext, signal("$wire", $rootWire));
-
     const listCursor = props.cursor;
     const store: StoreManager = (listCursor as any)[META_FLAG];
     const listCursorPath: string[] = getCursor(listCursor);
@@ -57,7 +54,7 @@ export const Each: <T extends ArrayOrObject>(
     ) as typeof listCursor;
     //console.log("value", value);
     const isArray = Array.isArray(listValue);
-    if (!isArray) throw new Error("<Each/> needs array");
+    if (!isArray) throw createError(110);
 
     const getItemCursor = (item: ExtractElement<typeof listCursor>) => {
       const store: StoreManager = (listCursor as any)[META_FLAG];
@@ -71,13 +68,6 @@ export const Each: <T extends ArrayOrObject>(
         return props.cursor[index];
       } else {
         // debugger;
-        console.error(
-          "accessing no existent item",
-          index,
-          item,
-          listValue,
-          listValue.length
-        );
       }
     };
 
