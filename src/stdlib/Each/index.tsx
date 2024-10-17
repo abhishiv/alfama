@@ -84,7 +84,7 @@ export const Each: <T extends ArrayOrObject>(
         const startIndex = 0;
         (value as typeof props.cursor).forEach((item, index) => {
           const previousChildren = [...(pStep.k || [])];
-          const { treeStep, el } = renderArray(
+          const [treeStep, el] = renderArray(
             pStep,
             props.renderItem,
             listCursor,
@@ -110,7 +110,7 @@ export const Each: <T extends ArrayOrObject>(
         //        console.log("data", data);
         data.args.forEach((arg, i) => {
           const index = previousChildren.length + i;
-          const { treeStep, el } = renderArray(
+          const [treeStep, el] = renderArray(
             pStep,
             props.renderItem,
             listCursor,
@@ -152,7 +152,7 @@ export const Each: <T extends ArrayOrObject>(
         items.forEach((item, i) => {
           const index = startIndex + i;
           const previousChildren = [...(pStep.k || [])];
-          const { treeStep, el } = renderArray(
+          const [treeStep, el] = renderArray(
             pStep,
             props.renderItem,
             listCursor,
@@ -198,5 +198,5 @@ const renderArray = (
   // console.log(getCursor(cursor));
   const vEl = renderItem(getItemCursor.bind(null, list[index]), index);
   const treeStep = getTreeStep(parentStep, undefined, vEl);
-  return { treeStep, el: vEl };
+  return [treeStep, vEl];
 };
