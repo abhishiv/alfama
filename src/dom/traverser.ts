@@ -167,7 +167,7 @@ export const getTreeStep = (
         onUnmount: [],
       } as ComponentTreeStep;
     } else {
-      console.error(el);
+      //      console.error(el);
       throw createError(110);
     }
   }

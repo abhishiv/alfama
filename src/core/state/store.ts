@@ -53,7 +53,7 @@ const createStoreSubscription = <T>(
     const v = getValueUsingPath(manager.v as any, cursorPath);
     return v;
   } catch (e) {
-    console.log(wire, wire.stores, encodedCursor, manager.v);
+    //    console.log(wire, wire.stores, encodedCursor, manager.v);
     throw e;
   }
 };

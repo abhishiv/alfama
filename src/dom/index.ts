@@ -1,37 +1,36 @@
+import { StoreManager, Wire, wireReset } from "../core/state";
 import * as DOMConstants from "../dom/constants";
-import {
-  Context,
-  ComponentUtils,
-  VElement,
-  Component,
-  ComponentVElement,
-  NativeVElement,
-  RenderContext,
-  TreeStep,
-} from "./types";
+import { getCursorProxyMeta } from "../utils";
 import { getRenderContext, renderTreeStep, rmNodes } from "./api";
-import { reifyTree } from "./traverser";
 import type {
   GenericEventAttrs,
   HTMLAttrs,
-  SVGAttrs,
   HTMLElements,
+  SVGAttrs,
   SVGElements,
-  TargetedEvent,
 } from "./jsx";
-import { runWire, StoreManager, Wire, wireReset } from "../core/state";
-import { getCursorProxyMeta } from "../utils";
+import {
+  Component,
+  ComponentUtils,
+  ComponentVElement,
+  Context,
+  NativeVElement,
+  RenderContext,
+  TreeStep,
+  VElement,
+} from "./types";
 
-export * from "./types";
-export * as DOMConstants from "./constants";
 export {
   addNode,
-  removeNode,
   insertElement,
   removeElement,
+  removeNode,
   updateElement,
 } from "./api";
+export * as DOMConstants from "./constants";
 export { reifyTree } from "./traverser";
+export * from "./types";
+export { h };
 
 export function defineContext<T = any>(arg?: string): Context<T> {
   return {
@@ -64,7 +63,6 @@ function h(
     t: t,
   } as ComponentVElement | NativeVElement;
 }
-export { h };
 
 export function render(
   element: VElement,

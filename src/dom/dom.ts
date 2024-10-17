@@ -7,24 +7,25 @@ const createTextNode = (arg: string | number | boolean | null | undefined) =>
 
 const createMarker = (text: string, owner: DocumentFragment) => {
   const marker = document.createComment(text);
-  (marker as any).__owner__ = owner;
+  // (marker as any).__owner__ = owner;
   return marker;
 };
 
+// important only use append/prepend
 export class LiveDocumentFragment extends DocumentFragment {
-  startMarker: Comment;
-  endMarker: Comment;
+  start: Comment;
+  end: Comment;
   constructor(t?: string) {
     super();
-    this.startMarker = createMarker(`<${t}>`, this);
-    this.endMarker = createMarker(`</${t}>`, this);
-    super.append(this.startMarker, this.endMarker);
+    this.start = createMarker(`<${t}>`, this);
+    this.end = createMarker(`</${t}>`, this);
+    super.append(this.start, this.end);
   }
   append(...nodes: Node[]) {
-    this.endMarker.before(...nodes);
+    this.end.before(...nodes);
   }
   prepend(...nodes: Node[]) {
-    this.startMarker.after(...nodes);
+    this.start.after(...nodes);
   }
 }
 
@@ -125,7 +126,7 @@ const setAttributeValue = (
     if (el.tagName === "INPUT" && attr === "value")
       (el as HTMLInputElement).value = val;
   } catch (e) {
-    console.error(el, attr, val);
+    //    console.error(el, attr, val);
     throw e;
   }
 };

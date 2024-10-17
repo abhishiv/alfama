@@ -84,10 +84,10 @@ export const updateElement = (
 
 export const getLiveFragmentChildNodes = (frag: LiveDocumentFragment) => {
   const els: Node[] = [];
-  let node: Node | null = frag.startMarker;
+  let node: Node | null = frag.start;
   while (node) {
     els.push(node);
-    if (node === frag.endMarker) {
+    if (node === frag.end) {
       break;
     }
     node = node.nextSibling;
