@@ -49,10 +49,6 @@ export const reifyTree = (
             .filter((el) => el.dom)
             .map((el: TreeStep) => el.dom as Node)
             .flat();
-          if ((step as ComponentTreeStep).mount) {
-            //console.log("s", step);
-          }
-          // this enables support for portals
           (
             (step as ComponentTreeStep).mount || (dom as unknown as Element)
           ).append(...kids);

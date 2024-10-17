@@ -17,7 +17,7 @@ export type SignalSetter<T> = (newValue: T) => void;
 export type SignalAPI<T = any> = [SignalGetter<T>, SignalSetter<T>];
 
 export type Signal<T = unknown> = SignalAPI & {
-  id: string;
+  id: number;
   /** Wires subscribed to this signal */
   w: Set<Wire<any>>;
   /** To check "if x is a signal" */
@@ -78,7 +78,7 @@ export type StoreChange = {
 type WireState = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 export type Wire<T = unknown> = {
-  id: string;
+  id: number;
   type: typeof Constants.WIRE;
 
   fn: WireFunction<T> | StoreCursor;

@@ -31,7 +31,7 @@ export const createSignal = <T = any>(val: T): Signal<T> => {
   };
 
   const sig = [get, set] as unknown as Signal<T>;
-  sig.id = "signal|" + SIGNAL_COUNTER;
+  sig.id = SIGNAL_COUNTER;
   sig.type = Constants.SIGNAL;
   sig.v = val;
   sig.w = new Set<Wire>();

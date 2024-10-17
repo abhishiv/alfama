@@ -26,7 +26,7 @@ const S_NEEDS_RUN = 0b001 as const;
 export const createWire: WireFactory = (arg: WireFunction): Wire => {
   WIRE_COUNTER++;
   const wire: Wire = Object.assign(() => {}, {
-    id: "wire|" + WIRE_COUNTER,
+    id: WIRE_COUNTER,
     type: Constants.WIRE,
     fn: arg,
     sigs: new Set(),
