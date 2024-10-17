@@ -4,9 +4,7 @@ export const crawl = <T>(
   iterate: (node: T) => void,
   options: { order: "post"; kids: (node: T) => T[] }
 ) => {
-  if (options.order === "post") {
-    dfsPostOrder(root, iterate, options.kids);
-  }
+  dfsPostOrder(root, iterate, options.kids);
 };
 
 // Helper function for dfsPostOrder.
