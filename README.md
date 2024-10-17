@@ -65,6 +65,7 @@ import { component, h, render } from "alfama";
 const Page = component("HomePage", (props, { signal, wire }) => {
   // 2) Named signals for stable HMR
   const [count, setCount] = signal("count", 0);
+  // or $count = signal("count", 0) and then $count.get/$count.set
 
   // 3) Most importantly: wire reactivity to signals
   // with explicit subscription using the $ token param
