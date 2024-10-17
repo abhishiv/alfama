@@ -40,13 +40,13 @@ export const insertElement = (
     const child = step.k.find((el) => el.id === key);
     return child;
   }, parentStep);
-  if (!step) throw new Error("");
+  if (!step) throw createError(120);
 
   const afterIndex = after
     ? step.k.findIndex((el) => el.id === after)
     : undefined;
 
-  const { root, registry } = reifyTree(renderContext, el, step, afterIndex);
+  const [registry, root] = reifyTree(renderContext, el, step, afterIndex);
 
   addNode(
     renderContext,
@@ -184,7 +184,7 @@ export const renderTreeStep = (renderCtx: RenderContext, element: VElement) => {
   // todo: move this to getRenderContext so it clears DOM properly
   //if (window.ss) return;
   renderCtx.el.innerHTML = "";
-  const { root, registry } = reifyTree(renderCtx, element);
+  const [registry, root] = reifyTree(renderCtx, element);
   const id = getVirtualElementId(root.node);
   if (!id) throw createError(101);
   addNode(renderCtx, undefined, root);
@@ -199,14 +199,14 @@ export const getRenderContext = (
   if (!id) throw createError(101);
 
   const renderContext: RenderContext = (container as any)[id] || {
-    prevState: new Map(),
+    prev: new Map(),
     el: container,
     id,
     reg: new Set(),
   };
 
   //console.log("renderContext", renderContext);
-  renderContext.prevState.clear();
+  renderContext.prev.clear();
 
   // so HMR is properly cleaned up
   renderContext.reg.forEach((step) => {
@@ -233,7 +233,7 @@ export const getRenderContext = (
         ancestor = ancestor.parent;
       }
       // dont preserve stores for now
-      renderContext.prevState.set(ids, {
+      renderContext.prev.set(ids, {
         ...step.state,
         //stores: {},
         //signals: {},

@@ -116,7 +116,7 @@ export type TreeStep =
 export interface RenderContext {
   id: string;
   el: Element;
-  prevState: Map<string[], ComponentTreeStepState>;
+  prev: Map<string[], ComponentTreeStepState>;
   reg: Set<TreeStep>;
 }
 

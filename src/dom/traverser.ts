@@ -22,7 +22,7 @@ export const reifyTree = (
   el: VElement,
   parent?: TreeStep,
   afterIndex?: number
-) => {
+): [TreeStep[], TreeStep] => {
   const root = getTreeStep(
     parent,
     undefined,
@@ -61,7 +61,7 @@ export const reifyTree = (
       kids: getChildrenFromStep.bind(null, renderContext),
     }
   );
-  return { registry, root };
+  return [registry, root];
 };
 
 const getComponentChildrenFromStep = (

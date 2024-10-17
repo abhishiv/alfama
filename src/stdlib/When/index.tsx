@@ -35,7 +35,7 @@ export const When = component<WhenProps>(
       const view = getView(value);
       const u = view ? view() : null;
       const previousChildren = [...parentStep.k];
-      const { registry, root } = reifyTree(renderContext, u, parentStep);
+      const [registry, root] = reifyTree(renderContext, u, parentStep);
       addNode(renderContext, parentStep, root);
       for (var n of previousChildren) {
         removeNode(renderContext, n);

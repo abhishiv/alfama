@@ -59,7 +59,7 @@ export const getTreeStepRenderContextState = (
     }
   };
 
-  const match = findMatchingResult(renderContext.prevState, step);
+  const match = findMatchingResult(renderContext.prev, step);
   return match;
 };
 

@@ -93,7 +93,7 @@ export const Each: <T extends ArrayOrObject>(
             utils,
             getItemCursor
           );
-          const { registry, root } = reifyTree(renderContext, el, pStep);
+          const [registry, root] = reifyTree(renderContext, el, pStep);
           const before = previousChildren[startIndex + index] || null;
           addNode(renderContext, pStep, root, before);
         });
@@ -120,7 +120,7 @@ export const Each: <T extends ArrayOrObject>(
             getItemCursor
           );
           // console.log({ treeStep, el, index, previousChildren });
-          const { registry, root } = reifyTree(renderContext, el, pStep);
+          const [registry, root] = reifyTree(renderContext, el, pStep);
           addNode(renderContext, pStep, root);
         });
       } else if (data?.name === "pop") {
@@ -161,7 +161,7 @@ export const Each: <T extends ArrayOrObject>(
             utils,
             getItemCursor
           );
-          const { registry, root } = reifyTree(renderContext, el, pStep);
+          const [registry, root] = reifyTree(renderContext, el, pStep);
           const before = previousChildren[startIndex + i] || null;
           addNode(renderContext, pStep, root, before);
         });
