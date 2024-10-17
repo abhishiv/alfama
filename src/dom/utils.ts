@@ -21,9 +21,6 @@ export const getDescendants = (node: TreeStep): TreeStep[] => {
     },
     {
       kids: (parent) => {
-        if (!parent.k) {
-          console.log(parent);
-        }
         return [...(Array.isArray(parent.k) ? parent.k : [])];
       },
       order: "post",
