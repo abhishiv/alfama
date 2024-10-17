@@ -49,13 +49,7 @@ const createStoreSubscription = <T>(
     set.add(encodedCursor);
     wire.stores.set(manager, set);
   }
-  try {
-    const v = getValueUsingPath(manager.v as any, cursorPath);
-    return v;
-  } catch (e) {
-    //    console.log(wire, wire.stores, encodedCursor, manager.v);
-    throw e;
-  }
+  return getValueUsingPath(manager.v as any, cursorPath);
 };
 
 // Handle changes in the store and trigger associated tasks and wires
@@ -97,10 +91,7 @@ const findMatchingWires = (
     for (const cursorStr of cursors) {
       const cursor = cursorStr === "" ? [] : decodeCursor(cursorStr);
       const isMatch = matchCursorToChange(cursor, changePath, changeData);
-
-      if (isMatch) {
-        matchingWires.add(wire);
-      }
+      isMatch && matchingWires.add(wire);
     }
   });
 

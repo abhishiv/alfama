@@ -21,7 +21,7 @@ export const getDescendants = (node: TreeStep): TreeStep[] => {
     },
     {
       kids: (parent) => {
-        return [...(Array.isArray(parent.k) ? parent.k : [])];
+        return Array.isArray(parent.k) ? parent.k : [];
       },
       order: "post",
     }
@@ -71,7 +71,6 @@ export const getContextProvider = (
   while (ancestor) {
     if (
       ancestor.type === DOMConstants.ComponentTreeStep &&
-      ancestor.state.ctx &&
       ancestor.state.ctx.get(ctxName)
     ) {
       return ancestor;
@@ -127,9 +126,7 @@ export const getVirtualElementId = (
 export const arrayRemove = <T>(array: T[], ...items: T[]): void => {
   items.forEach((item) => {
     const index = array.indexOf(item);
-    if (index !== -1) {
-      array.splice(index, 1);
-    }
+    index !== -1 && array.splice(index, 1);
   });
 };
 
